@@ -64,15 +64,33 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+        
+        /* Mobile sidebar overlay */
+        #sidebar {
+            transition: transform 0.3s ease;
+        }
+        @media (max-width: 768px) {
+            #sidebar {
+                position: fixed;
+                z-index: 50;
+                transform: translateX(-100%);
+            }
+            #sidebar.open {
+                transform: translateX(0);
+            }
+        }
     </style>
 </head>
 
 <body class="bg-black text-slate-300 antialiased">
 
+    <!-- Mobile Overlay -->
+    <div id="overlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden" onclick="toggleSidebar()"></div>
+
     <div class="flex h-screen overflow-hidden">
         
         <!-- Sidebar -->
-        <aside class="w-72 bg-slate-900 border-r border-slate-800 flex flex-col overflow-y-auto scrollbar-hide">
+        <aside id="sidebar" class="w-72 bg-slate-900 border-r border-slate-800 flex flex-col overflow-y-auto scrollbar-hide md:relative md:translate-x-0 h-full">
             
             <!-- Profile Section -->
             <div class="p-6 border-b border-slate-800">
@@ -174,23 +192,29 @@
         <main class="flex-1 overflow-y-auto bg-black">
             
             <!-- Header -->
-            <header class="sticky top-0 z-10 bg-slate-900/95 backdrop-blur-sm border-b border-slate-800 px-8 py-4">
+            <header class="sticky top-0 z-10 bg-slate-900/95 backdrop-blur-sm border-b border-slate-800 px-4 md:px-8 py-4">
                 <div class="flex items-center justify-between">
-                    <div>
-                        <h1 class="text-2xl font-bold text-white">CTF Writeups</h1>
-                        <p class="text-sm text-slate-400 mt-1">My journey through Capture The Flag competitions</p>
-                    </div>
                     <div class="flex items-center gap-3">
-                        <input type="text" id="searchInput" placeholder="Search challenges..." class="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500" onkeyup="searchChallenges()">
-                        <button class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors">
-                            <i class="ph-bold ph-funnel text-lg"></i>
+                        <!-- Mobile Menu Button -->
+                        <button onclick="toggleSidebar()" class="md:hidden p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors">
+                            <i class="ph-bold ph-list text-xl text-white"></i>
+                        </button>
+                        <div>
+                            <h1 class="text-xl md:text-2xl font-bold text-white">CTF Writeups</h1>
+                            <p class="text-xs md:text-sm text-slate-400 mt-1 hidden sm:block">My journey through Capture The Flag competitions</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 md:gap-3">
+                        <input type="text" id="searchInput" placeholder="Search..." class="hidden sm:block bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500" onkeyup="searchChallenges()">
+                        <button class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors sm:hidden">
+                            <i class="ph-bold ph-magnifying-glass text-lg"></i>
                         </button>
                     </div>
                 </div>
             </header>
 
             <!-- Content Area -->
-            <div class="p-8">
+            <div class="p-4 md:p-8">
                 
                 <!-- Overview Section -->
                 <div id="overview-section" class="section-content">
@@ -367,6 +391,18 @@
                 const text = card.textContent.toLowerCase();
                 card.style.display = text.includes(searchTerm) ? 'block' : 'none';
             });
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.toggle('open');
+            
+            if (sidebar.classList.contains('open')) {
+                overlay.classList.remove('hidden');
+            } else {
+                overlay.classList.add('hidden');
+            }
         }
 
         // Initialize
