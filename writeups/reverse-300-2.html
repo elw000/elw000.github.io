@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reverse 300-2: Make the Pieces Sing - Writeup</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { 'sans': ['Inter', 'sans-serif'], 'mono': ['JetBrains Mono', 'monospace'] }}}}</script>
+    <style>
+        .code-block { background: #0f172a; border: 1px solid #1e293b; border-radius: 0.5rem; padding: 1rem; margin: 1rem 0; overflow-x: auto; }
+        .code-block pre { margin: 0; color: #e2e8f0; font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; line-height: 1.5; }
+    </style>
+</head>
+<body class="bg-black text-slate-300 font-sans antialiased">
+    <div class="max-w-5xl mx-auto px-6 py-12">
+        <a href="../ctf-new.html" class="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 mb-8">
+            <i class="ph-bold ph-arrow-left"></i> Back to CTF Writeups
+        </a>
+
+        <header class="mb-12">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="px-3 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/30 rounded-lg text-sm font-semibold uppercase">Reverse Engineering</span>
+                <span class="text-2xl font-bold text-blue-400">300 points</span>
+            </div>
+            <h1 class="text-4xl font-bold text-white mb-4">Make the Pieces Sing</h1>
+            <div class="flex items-center gap-6 text-sm text-slate-400">
+                <span class="flex items-center gap-2"><i class="ph-bold ph-calendar"></i> November 10, 2025</span>
+                <span class="flex items-center gap-2"><i class="ph-bold ph-flag"></i> PointerOverflow CTF 2025</span>
+            </div>
+        </header>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">Challenge Description</h2>
+            <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
+                <p class="text-slate-300 leading-relaxed mb-4">
+                    A unique challenge involving MIDI file analysis. The challenge provides a validator that checks if a MIDI file matches a specific "fingerprint". We need to create a MIDI file that passes validation to reveal the flag.
+                </p>
+                <p class="text-slate-400 text-sm">
+                    <strong>Files:</strong> rev300-2_validator.py, fingerprint.bin
+                </p>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">Step 1: Understanding MIDI Files</h2>
+            
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-white mb-3">MIDI Basics</h3>
+                <p class="text-slate-300 mb-4">
+                    MIDI (Musical Instrument Digital Interface) files contain musical note data. Key concepts:
+                </p>
+                <ul class="space-y-2 text-slate-300 list-disc list-inside ml-4">
+                    <li><strong>Note-On events:</strong> Start playing a note (pitch + velocity)</li>
+                    <li><strong>Note-Off events:</strong> Stop playing a note</li>
+                    <li><strong>Delta-time:</strong> Time delay between events</li>
+                    <li><strong>Tracks:</strong> Separate sequences of events</li>
+                </ul>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-white mb-3">MIDI File Structure</h3>
+                <div class="code-block">
+                    <pre><code>MIDI File:
+├── Header Chunk (MThd)
+│   ├── Format (0, 1, or 2)
+│   ├── Number of tracks
+│   └── Time division
+└── Track Chunks (MTrk)
+    └── Events
+        ├── Delta-time (variable length)
+        ├── Event type (Note-On, Note-Off, etc.)
+        └── Event data (pitch, velocity, etc.)</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">Step 2: Analyzing the Validator</h2>
+            
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-white mb-3">Fingerprint Format</h3>
+                <p class="text-slate-300 mb-4">
+                    The fingerprint is a 40-byte binary file that encodes the expected MIDI sequence:
+                </p>
+                <div class="code-block">
+                    <pre><code>$ xxd fingerprint.bin
+00000000: 3c 10 42 08 45 18 47 20 4a 10 4c 08 4e 18 50 20
+00000010: 52 10 54 08 55 18 57 20 59 10 5b 08 5d 18 5f 20
+00000020: 60 10 62 08 64 18 66 20</code></pre>
+                </div>
+                <p class="text-slate-300 mt-4">
+                    Each pair of bytes represents:
+                </p>
+                <ul class="space-y-2 text-slate-300 list-disc list-inside ml-4">
+                    <li><strong>First byte:</strong> MIDI note pitch (0-127)</li>
+                    <li><strong>Second byte:</strong> Delta-time before next note</li>
+                </ul>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-white mb-3">Validation Logic</h3>
+                <p class="text-slate-300 mb-4">
+                    The validator extracts Note-On events from the MIDI file and compares them against the fingerprint:
+                </p>
+                <div class="code-block">
+                    <pre><code>def validate_midi(midi_file, fingerprint):
+    # Parse MIDI file
+    notes = extract_note_events(midi_file)
+    
+    # Compare with fingerprint
+    for i, (pitch, delta) in enumerate(fingerprint):
+        if notes[i].pitch != pitch:
+            return False
+        if notes[i].delta_time != delta:
+            return False
+    
+    return True</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">Step 3: Creating the MIDI File</h2>
+            
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-white mb-3">Parsing the Fingerprint</h3>
+                <div class="code-block">
+                    <pre><code>#!/usr/bin/env python3
+
+# Read fingerprint
+with open('fingerprint.bin', 'rb') as f:
+    fingerprint = f.read()
+
+# Parse into (pitch, delta_time) pairs
+notes = []
+for i in range(0, len(fingerprint), 2):
+    pitch = fingerprint[i]
+    delta_time = fingerprint[i + 1]
+    notes.append((pitch, delta_time))
+
+print(f"[+] Parsed {len(notes)} notes:")
+for i, (pitch, delta) in enumerate(notes):
+    print(f"  Note {i}: pitch={pitch} (0x{pitch:02x}), delta={delta}")</code></pre>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-white mb-3">Building the MIDI File</h3>
+                <p class="text-slate-300 mb-4">
+                    We need to construct a valid MIDI file with the correct note sequence:
+                </p>
+                <div class="code-block">
+                    <pre><code>#!/usr/bin/env python3
+import struct
+
+def write_variable_length(value):
+    """Convert integer to MIDI variable-length format"""
+    result = []
+    result.append(value & 0x7F)
+    value >>= 7
+    while value > 0:
+        result.insert(0, (value & 0x7F) | 0x80)
+        value >>= 7
+    return bytes(result)
+
+def create_midi_file(notes, output_file):
+    # MIDI Header
+    header = b'MThd'
+    header += struct.pack('>I', 6)  # Header length
+    header += struct.pack('>H', 0)  # Format 0
+    header += struct.pack('>H', 1)  # 1 track
+    header += struct.pack('>H', 480)  # Ticks per quarter note
+    
+    # Track data
+    track_data = b''
+    
+    for pitch, delta_time in notes:
+        # Delta-time
+        track_data += write_variable_length(delta_time)
+        
+        # Note-On event (0x90 = Note-On, channel 0)
+        track_data += bytes([0x90, pitch, 64])  # velocity=64
+        
+        # Note-Off after short duration
+        track_data += write_variable_length(0)  # No delay
+        track_data += bytes([0x80, pitch, 0])  # Note-Off
+    
+    # End of track
+    track_data += b'\x00\xFF\x2F\x00'
+    
+    # Track chunk
+    track = b'MTrk'
+    track += struct.pack('>I', len(track_data))
+    track += track_data
+    
+    # Write file
+    with open(output_file, 'wb') as f:
+        f.write(header + track)
+    
+    print(f"[+] Created MIDI file: {output_file}")
+
+# Parse fingerprint and create MIDI
+with open('fingerprint.bin', 'rb') as f:
+    fingerprint = f.read()
+
+notes = [(fingerprint[i], fingerprint[i+1]) 
+         for i in range(0, len(fingerprint), 2)]
+
+create_midi_file(notes, 'song.mid')</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">Step 4: Validation and Flag Extraction</h2>
+            
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-white mb-3">Running the Validator</h3>
+                <div class="code-block">
+                    <pre><code>$ python3 create_midi.py
+[+] Parsed 20 notes:
+  Note 0: pitch=60 (0x3c), delta=16
+  Note 1: pitch=66 (0x42), delta=8
+  Note 2: pitch=69 (0x45), delta=24
+  ...
+[+] Created MIDI file: song.mid
+
+$ python3 rev300-2_validator.py song.mid
+[+] Validating MIDI file...
+[+] Fingerprint matches!
+[+] FLAG: poctf{uwsp_m4k3_7h3_p13c35_51n6}</code></pre>
+                </div>
+            </div>
+
+            <div class="bg-green-900/20 border border-green-500/30 rounded-lg p-4">
+                <p class="text-green-300">
+                    <strong>Success!</strong> The MIDI file passes validation and the validator reveals the flag.
+                </p>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">Flag</h2>
+            <div class="bg-gradient-to-r from-green-900/50 to-emerald-900/50 border border-green-500/30 rounded-lg p-6">
+                <div class="flex items-center gap-3">
+                    <i class="ph-bold ph-check-circle text-3xl text-green-400"></i>
+                    <code class="text-xl font-mono text-green-400">poctf{uwsp_m4k3_7h3_p13c35_51n6}</code>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">Key Learnings</h2>
+            <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
+                <ul class="space-y-3 text-slate-300">
+                    <li class="flex items-start gap-3">
+                        <i class="ph-bold ph-check text-blue-400 mt-1"></i>
+                        <span><strong>File Format Analysis:</strong> Understanding binary file formats is crucial for reverse engineering</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="ph-bold ph-check text-blue-400 mt-1"></i>
+                        <span><strong>MIDI Structure:</strong> MIDI files use variable-length encoding for delta-times</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="ph-bold ph-check text-blue-400 mt-1"></i>
+                        <span><strong>Data Encoding:</strong> Binary data can encode multiple pieces of information per byte</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="ph-bold ph-check text-blue-400 mt-1"></i>
+                        <span><strong>Validation Logic:</strong> Understanding the validation algorithm is key to crafting valid input</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-bold text-white mb-4">Tools Used</h2>
+            <div class="flex flex-wrap gap-3">
+                <span class="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-300">Python 3</span>
+                <span class="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-300">xxd</span>
+                <span class="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-300">struct module</span>
+                <span class="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-300">MIDI specification</span>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

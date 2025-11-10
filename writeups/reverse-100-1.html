@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reverse 100-1: Seven Easy Pieces - Writeup</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { 'sans': ['Inter', 'sans-serif'], 'mono': ['JetBrains Mono', 'monospace'] }}}}</script>
+    <style>
+        .code-block { background: #0f172a; border: 1px solid #1e293b; border-radius: 0.5rem; padding: 1rem; margin: 1rem 0; overflow-x: auto; }
+        .code-block pre { margin: 0; color: #e2e8f0; font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; line-height: 1.5; }
+    </style>
+</head>
+<body class="bg-black text-slate-300 font-sans antialiased">
+    <div class="max-w-5xl mx-auto px-6 py-12">
+        <a href="../ctf-new.html" class="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 mb-8">
+            <i class="ph-bold ph-arrow-left"></i> Back to CTF Writeups
+        </a>
+
+        <header class="mb-12">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="px-3 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/30 rounded-lg text-sm font-semibold uppercase">Reverse Engineering</span>
+                <span class="text-2xl font-bold text-blue-400">100 points</span>
+            </div>
+            <h1 class="text-4xl font-bold text-white mb-4">Seven Easy Pieces</h1>
+            <div class="flex items-center gap-6 text-sm text-slate-400">
+                <span class="flex items-center gap-2"><i class="ph-bold ph-calendar"></i> November 10, 2025</span>
+                <span class="flex items-center gap-2"><i class="ph-bold ph-flag"></i> PointerOverflow CTF 2025</span>
+            </div>
+        </header>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">Challenge Description</h2>
+            <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
+                <p class="text-slate-300 leading-relaxed">
+                    A beginner-friendly reverse engineering challenge. The binary is a simple ELF executable that contains the flag.
+                </p>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">Step 1: Initial Reconnaissance</h2>
+            
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-white mb-3">File Analysis</h3>
+                <p class="text-slate-300 mb-4">
+                    First, let's identify what we're dealing with:
+                </p>
+                <div class="code-block">
+                    <pre><code>$ file rev100-1
+rev100-1: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked</code></pre>
+                </div>
+                <p class="text-slate-300 mt-4">
+                    It's a standard 64-bit Linux executable. Let's check if it's stripped:
+                </p>
+                <div class="code-block">
+                    <pre><code>$ file rev100-1 | grep -o "not stripped"
+not stripped</code></pre>
+                </div>
+                <p class="text-slate-300 mt-4">
+                    Good! The binary is not stripped, meaning it still contains debugging symbols.
+                </p>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-white mb-3">Running the Binary</h3>
+                <p class="text-slate-300 mb-4">
+                    Let's see what happens when we run it:
+                </p>
+                <div class="code-block">
+                    <pre><code>$ chmod +x rev100-1
+$ ./rev100-1
+Enter password: test
+Wrong!</code></pre>
+                </div>
+                <p class="text-slate-300 mt-4">
+                    The binary asks for a password. We need to find it.
+                </p>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">Step 2: Static Analysis with Strings</h2>
+            
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-white mb-3">Extracting Readable Strings</h3>
+                <p class="text-slate-300 mb-4">
+                    The <code class="bg-slate-800 px-2 py-1 rounded text-blue-400">strings</code> command extracts all printable character sequences from a binary:
+                </p>
+                <div class="code-block">
+                    <pre><code>$ strings rev100-1
+/lib64/ld-linux-x86-64.so.2
+libc.so.6
+puts
+printf
+strcmp
+__libc_start_main
+Enter password: 
+Wrong!
+Correct!
+poctf{uwsp_s3v3n_345y_p13c35}
+GCC: (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0</code></pre>
+                </div>
+            </div>
+
+            <div class="bg-green-900/20 border border-green-500/30 rounded-lg p-4 mb-6">
+                <p class="text-green-300">
+                    <strong>Flag Found!</strong> The flag is embedded as a plaintext string in the binary.
+                </p>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-white mb-3">Filtering for the Flag</h3>
+                <p class="text-slate-300 mb-4">
+                    We can directly search for the flag format:
+                </p>
+                <div class="code-block">
+                    <pre><code>$ strings rev100-1 | grep poctf
+poctf{uwsp_s3v3n_345y_p13c35}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">Step 3: Verification</h2>
+            
+            <p class="text-slate-300 mb-4">
+                Let's verify the flag works:
+            </p>
+            <div class="code-block">
+                <pre><code>$ ./rev100-1
+Enter password: poctf{uwsp_s3v3n_345y_p13c35}
+Correct!</code></pre>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">Alternative Approach: Using Ghidra</h2>
+            
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-white mb-3">Decompilation</h3>
+                <p class="text-slate-300 mb-4">
+                    We could also use Ghidra to decompile the binary:
+                </p>
+                <ol class="space-y-2 text-slate-300 list-decimal list-inside">
+                    <li>Open Ghidra and create a new project</li>
+                    <li>Import the binary file</li>
+                    <li>Analyze with default options</li>
+                    <li>Navigate to the <code class="bg-slate-800 px-2 py-1 rounded text-blue-400">main</code> function</li>
+                </ol>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-white mb-3">Decompiled Code</h3>
+                <div class="code-block">
+                    <pre><code>int main(void) {
+    char input[100];
+    
+    printf("Enter password: ");
+    fgets(input, 100, stdin);
+    
+    if (strcmp(input, "poctf{uwsp_s3v3n_345y_p13c35}\n") == 0) {
+        puts("Correct!");
+    } else {
+        puts("Wrong!");
+    }
+    
+    return 0;
+}</code></pre>
+                </div>
+                <p class="text-slate-300 mt-4">
+                    The decompiled code shows a simple string comparison. The flag is hardcoded in the binary.
+                </p>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">Flag</h2>
+            <div class="bg-gradient-to-r from-green-900/50 to-emerald-900/50 border border-green-500/30 rounded-lg p-6">
+                <div class="flex items-center gap-3">
+                    <i class="ph-bold ph-check-circle text-3xl text-green-400"></i>
+                    <code class="text-xl font-mono text-green-400">poctf{uwsp_s3v3n_345y_p13c35}</code>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">Key Learnings</h2>
+            <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
+                <ul class="space-y-3 text-slate-300">
+                    <li class="flex items-start gap-3">
+                        <i class="ph-bold ph-check text-blue-400 mt-1"></i>
+                        <span><strong>Start Simple:</strong> Always begin with basic tools like <code class="bg-slate-800 px-2 py-1 rounded text-blue-400">strings</code> before moving to complex analysis</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="ph-bold ph-check text-blue-400 mt-1"></i>
+                        <span><strong>Hardcoded Secrets:</strong> Never store sensitive data as plaintext strings in binaries</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="ph-bold ph-check text-blue-400 mt-1"></i>
+                        <span><strong>Multiple Approaches:</strong> There are often several ways to solve a challenge - choose the most efficient</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-bold text-white mb-4">Tools Used</h2>
+            <div class="flex flex-wrap gap-3">
+                <span class="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-300">strings</span>
+                <span class="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-300">file</span>
+                <span class="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-300">grep</span>
+                <span class="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-300">Ghidra</span>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

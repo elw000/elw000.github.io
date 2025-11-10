@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reverse 300-1: Through a Glass Darkly - Writeup</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { 'sans': ['Inter', 'sans-serif'], 'mono': ['JetBrains Mono', 'monospace'] }}}}</script>
+    <style>
+        .code-block { background: #0f172a; border: 1px solid #1e293b; border-radius: 0.5rem; padding: 1rem; margin: 1rem 0; overflow-x: auto; }
+        .code-block pre { margin: 0; color: #e2e8f0; font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; line-height: 1.5; }
+        .step-number { width: 2rem; height: 2rem; background: rgba(59, 130, 246, 0.2); color: #60a5fa; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
+    </style>
+</head>
+<body class="bg-black text-slate-300 font-sans antialiased">
+    <div class="max-w-5xl mx-auto px-6 py-12">
+        <a href="../ctf-new.html" class="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 mb-8">
+            <i class="ph-bold ph-arrow-left"></i> Back to CTF Writeups
+        </a>
+
+        <header class="mb-12">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="px-3 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/30 rounded-lg text-sm font-semibold uppercase">Reverse Engineering</span>
+                <span class="text-2xl font-bold text-blue-400">300 points</span>
+            </div>
+            <h1 class="text-4xl font-bold text-white mb-4">Through a Glass Darkly</h1>
+            <div class="flex items-center gap-6 text-sm text-slate-400">
+                <span class="flex items-center gap-2"><i class="ph-bold ph-calendar"></i> November 10, 2025</span>
+                <span class="flex items-center gap-2"><i class="ph-bold ph-flag"></i> PointerOverflow CTF 2025</span>
+                <span class="flex items-center gap-2"><i class="ph-bold ph-clock"></i> 2 hours solve time</span>
+            </div>
+        </header>
+
+        <!-- Challenge Description -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">📋 Challenge Description</h2>
+            <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
+                <p class="text-slate-300 leading-relaxed mb-4">
+                    A WebAssembly (WASM) based flag verification challenge. The challenge provides a <code class="bg-slate-800 px-2 py-1 rounded text-blue-400">verifier.wasm</code> file and a Node.js wrapper that checks if your input matches the flag using custom encryption.
+                </p>
+                <p class="text-slate-400 text-sm">
+                    <strong>Files:</strong> verifier.wasm, verifier.js
+                </p>
+            </div>
+        </section>
+
+        <!-- Initial Analysis -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">🔍 Step 1: Initial Analysis</h2>
+            
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-white mb-3">Understanding WebAssembly</h3>
+                <p class="text-slate-300 mb-4">
+                    WebAssembly (WASM) is a binary instruction format designed for stack-based virtual machines. To analyze it, we need to convert it to a human-readable format.
+                </p>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-white mb-3">Converting WASM to WAT</h3>
+                <p class="text-slate-300 mb-4">
+                    First, let's convert the binary WASM to WebAssembly Text (WAT) format:
+                </p>
+                <div class="code-block">
+                    <pre><code>$ wasm2wat verifier.wasm > verifier.wat
+$ head -50 verifier.wat</code></pre>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-white mb-3">Decompiling with wasm-decompile</h3>
+                <p class="text-slate-300 mb-4">
+                    For better readability, we can decompile to pseudo-C code:
+                </p>
+                <div class="code-block">
+                    <pre><code>$ wasm-decompile verifier.wasm > verifier.c</code></pre>
+                </div>
+            </div>
+
+            <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
+                <p class="text-blue-300 text-sm">
+                    <strong>💡 Key Finding:</strong> The WASM contains a <code class="bg-slate-800 px-1 rounded">verify()</code> function that compares input against encrypted data using complex transformations.
+                </p>
+            </div>
+        </section>
+
+        <!-- Understanding the Algorithm -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">🧮 Step 2: Understanding the Encryption Algorithm</h2>
+            
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-white mb-3">Encrypted Data</h3>
+                <p class="text-slate-300 mb-4">
+                    From the WASM memory, we extract the encrypted flag:
+                </p>
+                <div class="code-block">
+                    <pre><code>encrypted = bytes.fromhex("43558424f75c90e9a8cd26bc074a0ea8e55a48e2ba777d6e1186be")
+# Length: 27 bytes</code></pre>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-white mb-3">The Key</h3>
+                <p class="text-slate-300 mb-4">
+                    The encryption key is embedded in the WASM:
+                </p>
+                <div class="code-block">
+                    <pre><code>key = b"through_a_glass_darkly"  # 22 bytes</code></pre>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-white mb-3">Encryption Formula</h3>
+                <p class="text-slate-300 mb-4">
+                    After analyzing the decompiled code, the encryption works as follows for each byte <code class="bg-slate-800 px-2 py-1 rounded">i</code>:
+                </p>
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 space-y-4">
+                    <div>
+                        <p class="text-slate-400 text-sm mb-2">1. Select key byte (with wrapping):</p>
+                        <div class="code-block">
+                            <pre><code>key_idx = i if i < 22 else i - 22
+k = key[key_idx]</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <p class="text-slate-400 text-sm mb-2">2. Transform the key byte:</p>
+                        <div class="code-block">
+                            <pre><code>c = k XOR ((i * 73 + 19) & 0xFF)</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <p class="text-slate-400 text-sm mb-2">3. Apply rotation:</p>
+                        <div class="code-block">
+                            <pre><code>d = (i & 255) % 7
+rot_left = (d + 1) & 7
+rot_right = d XOR 7
+
+# Rotate left
+rotated = ((c << rot_left) | (c >> (8 - rot_left))) & 0xFF
+
+# OR with rotate right
+rotated |= ((c >> rot_right) & 0xFF)</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <p class="text-slate-400 text-sm mb-2">4. Final encryption:</p>
+                        <div class="code-block">
+                            <pre><code>encrypted[i] = (input[i] XOR rotated) - i * 17 - 123</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Decryption Solution -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">🔓 Step 3: Reversing the Encryption</h2>
+            
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-white mb-3">Decryption Formula</h3>
+                <p class="text-slate-300 mb-4">
+                    To decrypt, we reverse the operations:
+                </p>
+                <div class="code-block">
+                    <pre><code>input[i] = (encrypted[i] + i * 17 + 123) XOR rotated</code></pre>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-white mb-3">Complete Solution Code</h3>
+                <div class="code-block">
+                    <pre><code>#!/usr/bin/env python3
+
+encrypted = bytes.fromhex("43558424f75c90e9a8cd26bc074a0ea8e55a48e2ba777d6e1186be")
+key = b"through_a_glass_darkly"
+
+flag = bytearray()
+
+for i in range(27):
+    # Step 1: Select key byte
+    key_idx = i if i < 22 else i - 22
+    k = key[key_idx]
+    
+    # Step 2: Transform key
+    c = k ^ ((i * 73 + 19) & 0xFF)
+    
+    # Step 3: Calculate rotation amounts
+    d = (i & 255) % 7
+    rot_left = (d + 1) & 7
+    rot_right = d ^ 7
+    
+    # Step 4: Apply rotations
+    rotated = ((c << rot_left) | (c >> (8 - rot_left))) & 0xFF
+    rotated |= ((c >> rot_right) & 0xFF)
+    
+    # Step 5: Decrypt
+    input_byte = ((encrypted[i] + i * 17 + 123) & 0xFF) ^ rotated
+    flag.append(input_byte)
+
+print(f"🚩 FLAG: {flag.decode('utf-8')}")</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Execution -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">▶️ Step 4: Running the Solution</h2>
+            
+            <div class="code-block">
+                <pre><code>$ python3 solve.py
+🚩 FLAG: poctf{uwsp_7hr0u6h_4_6l455_d4rkly}</code></pre>
+            </div>
+
+            <div class="bg-green-900/20 border border-green-500/30 rounded-lg p-4 mt-4">
+                <p class="text-green-300">
+                    <strong>✅ Success!</strong> The decryption worked perfectly on the first try after understanding the algorithm.
+                </p>
+            </div>
+        </section>
+
+        <!-- Verification -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">✓ Step 5: Verification</h2>
+            
+            <p class="text-slate-300 mb-4">
+                We can verify our solution by running it through the original verifier:
+            </p>
+            
+            <div class="code-block">
+                <pre><code>$ node verifier.js "poctf{uwsp_7hr0u6h_4_6l455_d4rkly}"
+✓ Correct!</code></pre>
+            </div>
+        </section>
+
+        <!-- Flag -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">🚩 Flag</h2>
+            <div class="bg-gradient-to-r from-green-900/50 to-emerald-900/50 border border-green-500/30 rounded-lg p-6">
+                <div class="flex items-center gap-3">
+                    <i class="ph-bold ph-check-circle text-3xl text-green-400"></i>
+                    <code class="text-xl font-mono text-green-400">poctf{uwsp_7hr0u6h_4_6l455_d4rkly}</code>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Learnings -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">📚 Key Learnings</h2>
+            <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
+                <ul class="space-y-3 text-slate-300">
+                    <li class="flex items-start gap-3">
+                        <i class="ph-bold ph-check text-blue-400 mt-1"></i>
+                        <span><strong>WebAssembly Analysis:</strong> Use <code class="bg-slate-800 px-2 py-1 rounded">wasm2wat</code> and <code class="bg-slate-800 px-2 py-1 rounded">wasm-decompile</code> to understand WASM binaries</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="ph-bold ph-check text-blue-400 mt-1"></i>
+                        <span><strong>Bit Rotations:</strong> Understanding ROL (rotate left) and ROR (rotate right) operations is crucial</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="ph-bold ph-check text-blue-400 mt-1"></i>
+                        <span><strong>XOR Properties:</strong> XOR is self-inverse: <code class="bg-slate-800 px-2 py-1 rounded">A XOR B XOR B = A</code></span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="ph-bold ph-check text-blue-400 mt-1"></i>
+                        <span><strong>Modular Arithmetic:</strong> Pay attention to <code class="bg-slate-800 px-2 py-1 rounded">& 0xFF</code> operations to keep values in byte range</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Tools -->
+        <section>
+            <h2 class="text-2xl font-bold text-white mb-4">🛠️ Tools Used</h2>
+            <div class="flex flex-wrap gap-3">
+                <span class="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-300">wasm2wat</span>
+                <span class="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-300">wasm-decompile</span>
+                <span class="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-300">Python 3</span>
+                <span class="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-300">Node.js</span>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

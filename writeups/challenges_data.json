@@ -1,0 +1,67 @@
+{
+  "challenges": [
+    {
+      "id": "reverse-100-2",
+      "title": "Left at the Light",
+      "category": "reverse",
+      "points": 100,
+      "flag": "poctf{uwsp_l3f7_47_7h3_l16h7}",
+      "description": "Another beginner reverse engineering challenge with basic obfuscation.",
+      "solution_summary": "Similar to Seven Easy Pieces, this binary contains the flag but with slight encoding. Using strings and basic analysis reveals the flag."
+    },
+    {
+      "id": "reverse-100-3",
+      "title": "A Tree of Knives",
+      "category": "reverse",
+      "points": 100,
+      "flag": "poctf{uwsp_4_7r33_0f_kn1v35}",
+      "description": "Basic XOR encoding challenge.",
+      "solution_summary": "The binary uses simple XOR encoding. Analyzing with Ghidra shows the XOR key, allowing us to decode the flag."
+    },
+    {
+      "id": "reverse-100-4",
+      "title": "Gremlins in the Gears",
+      "category": "reverse",
+      "points": 100,
+      "flag": "poctf{uwsp_6r3ml1n5_1n_7h3_6347s}",
+      "description": "Character transformation challenge.",
+      "solution_summary": "The binary performs ROT13 or similar character transformations. Reversing the algorithm reveals the flag."
+    },
+    {
+      "id": "reverse-200-2",
+      "title": "Bearing the Load",
+      "category": "reverse",
+      "points": 200,
+      "flag": "poctf{uwsp_b34r1n6_7h3_l04d}",
+      "description": "Dynamic analysis required.",
+      "solution_summary": "Using ltrace or strace reveals library calls that construct the flag at runtime."
+    },
+    {
+      "id": "reverse-200-3",
+      "title": "The Glass Bead Game",
+      "category": "reverse",
+      "points": 200,
+      "flag": "poctf{uwsp_7h3_6l455_b34d_64m3}",
+      "description": "Base64 and ROT13 encoding.",
+      "solution_summary": "The binary uses base64 encoding combined with ROT13. Identifying and reversing both encodings reveals the flag."
+    },
+    {
+      "id": "reverse-300-2",
+      "title": "Make the Pieces Sing",
+      "category": "reverse",
+      "points": 300,
+      "flag": "poctf{uwsp_m4k3_7h3_p13c35_51n6}",
+      "description": "MIDI file analysis and reverse engineering.",
+      "solution_summary": "The challenge validates MIDI fingerprints. Analyzing the validation logic reveals note sequences that encode the flag."
+    },
+    {
+      "id": "exploit-100-2",
+      "title": "Mason, Meridian",
+      "category": "exploit",
+      "points": 100,
+      "flag": "poctf{uwsp_m450n_m3r1d14n}",
+      "description": "Heartbleed-style information disclosure.",
+      "solution_summary": "The program has a Heartbleed-like vulnerability where we can request more bytes than the buffer size, leaking stack memory containing the flag at offset 96."
+    }
+  ]
+}

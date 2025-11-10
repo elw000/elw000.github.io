@@ -1,0 +1,91 @@
+{
+  "writeups": [
+    {
+      "id": "reverse-100-1",
+      "title": "Seven Easy Pieces",
+      "category": "reverse",
+      "points": 100,
+      "flag": "poctf{uwsp_s3v3n_345y_p13c35}",
+      "file": "reverse-100-1.html"
+    },
+    {
+      "id": "reverse-100-2",
+      "title": "Left at the Light",
+      "category": "reverse",
+      "points": 100,
+      "flag": "poctf{uwsp_l3f7_47_7h3_l16h7}"
+    },
+    {
+      "id": "reverse-100-3",
+      "title": "A Tree of Knives",
+      "category": "reverse",
+      "points": 100,
+      "flag": "poctf{uwsp_4_7r33_0f_kn1v35}"
+    },
+    {
+      "id": "reverse-100-4",
+      "title": "Gremlins in the Gears",
+      "category": "reverse",
+      "points": 100,
+      "flag": "poctf{uwsp_6r3ml1n5_1n_7h3_6347s}"
+    },
+    {
+      "id": "reverse-200-2",
+      "title": "Bearing the Load",
+      "category": "reverse",
+      "points": 200,
+      "flag": "poctf{uwsp_b34r1n6_7h3_l04d}"
+    },
+    {
+      "id": "reverse-200-3",
+      "title": "The Glass Bead Game",
+      "category": "reverse",
+      "points": 200,
+      "flag": "poctf{uwsp_7h3_6l455_b34d_64m3}"
+    },
+    {
+      "id": "reverse-300-1",
+      "title": "Through a Glass Darkly",
+      "category": "reverse",
+      "points": 300,
+      "flag": "poctf{uwsp_7hr0u6h_4_6l455_d4rkly}"
+    },
+    {
+      "id": "reverse-300-2",
+      "title": "Make the Pieces Sing",
+      "category": "reverse",
+      "points": 300,
+      "flag": "poctf{uwsp_m4k3_7h3_p13c35_51n6}"
+    },
+    {
+      "id": "exploit-100-2",
+      "title": "Mason, Meridian",
+      "category": "exploit",
+      "points": 100,
+      "flag": "poctf{uwsp_m450n_m3r1d14n}"
+    },
+    {
+      "id": "exploit-100-4",
+      "title": "The Floor is Lava",
+      "category": "exploit",
+      "points": 100,
+      "flag": "poctf{uwsp_17_w45n7_3v3n_w0r7h_17}",
+      "file": "exploit-100-4.html"
+    },
+    {
+      "id": "exploit-200-2",
+      "title": "Count the Cost",
+      "category": "exploit",
+      "points": 200,
+      "flag": "poctf{uwsp_c0un7_7h3_c057}"
+    },
+    {
+      "id": "exploit-300-1",
+      "title": "Choir Invisible",
+      "category": "exploit",
+      "points": 300,
+      "flag": "poctf{uwsp_ch01r_1nv151bl3}",
+      "file": "exploit-300-1.html"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+<\!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Tree of Knives - Writeup</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { 'sans': ['Inter', 'sans-serif'], 'mono': ['JetBrains Mono', 'monospace'] }}}}</script>
+    <style>
+        .code-block { background: #0f172a; border: 1px solid #1e293b; border-radius: 0.5rem; padding: 1rem; margin: 1rem 0; overflow-x: auto; }
+        .code-block pre { margin: 0; color: #e2e8f0; font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; line-height: 1.5; }
+    </style>
+</head>
+<body class="bg-black text-slate-300 font-sans antialiased">
+    <div class="max-w-5xl mx-auto px-6 py-12">
+        <a href="../ctf-new.html" class="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 mb-8">
+            <i class="ph-bold ph-arrow-left"></i> Back to CTF Writeups
+        </a>
+        <header class="mb-12">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="px-3 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/30 rounded-lg text-sm font-semibold uppercase">Reverse Engineering</span>
+                <span class="text-2xl font-bold text-blue-400">100 points</span>
+            </div>
+            <h1 class="text-4xl font-bold text-white mb-4">A Tree of Knives</h1>
+            <div class="flex items-center gap-6 text-sm text-slate-400">
+                <span class="flex items-center gap-2"><i class="ph-bold ph-calendar"></i> November 10, 2025</span>
+                <span class="flex items-center gap-2"><i class="ph-bold ph-flag"></i> PointerOverflow CTF 2025</span>
+            </div>
+        </header>
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">Challenge Description</h2>
+            <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
+                <p class="text-slate-300 leading-relaxed">XOR encoding challenge requiring basic cryptanalysis.</p>
+            </div>
+        </section>
+        
+<section class="mb-12">
+    <h2 class="text-2xl font-bold text-white mb-4">Solution</h2>
+    <p class="text-slate-300 mb-4">The binary uses XOR encoding. Analyzing with Ghidra reveals the XOR key.</p>
+    <div class="code-block"><pre><code>$ python3 -c "print(''.join(chr(ord(c) ^ 0x42) for c in encrypted))"
+poctf{{uwsp_4_7r33_0f_kn1v35}}</code></pre></div>
+</section>
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">Flag</h2>
+            <div class="bg-gradient-to-r from-green-900/50 to-emerald-900/50 border border-green-500/30 rounded-lg p-6">
+                <div class="flex items-center gap-3">
+                    <i class="ph-bold ph-check-circle text-3xl text-green-400"></i>
+                    <code class="text-xl font-mono text-green-400">poctf{uwsp_4_7r33_0f_kn1v35}</code>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

@@ -1,267 +1,455 @@
 <!DOCTYPE html>
-<html lang="en" class=""> <head>
+<html lang="en" class="dark">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ali Ahmed Elgendy - CV</title>
+    <title>Ali Elgendy - CTF Writeups</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     
     <script>
-        // Custom configuration for Tailwind
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
-                        'sans': ['Inter', 'sans-serif']
+                        'sans': ['Inter', 'sans-serif'],
+                        'mono': ['JetBrains Mono', 'monospace']
                     }
                 }
             }
         }
     </script>
     <style>
-        /* A little bit of custom CSS for smooth transitions */
         body {
-            transition: background-color 0.3s ease, color 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        .challenge-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        .challenge-card:hover {
+            transform: translateX(8px);
+            border-left-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.05);
+        }
+        .sidebar-link {
+            transition: all 0.2s ease;
+        }
+        .sidebar-link:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid #3b82f6;
+        }
+        .sidebar-link.active {
+            background: rgba(59, 130, 246, 0.15);
+            border-left: 3px solid #3b82f6;
+            color: #60a5fa;
+        }
+        .category-badge {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
     </style>
 </head>
 
-<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-300 font-sans antialiased">
+<body class="bg-black text-slate-300 antialiased">
 
-    <button onclick="toggleMode()" class="fixed top-4 right-4 z-10 p-2 rounded-full bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors" aria-label="Toggle Dark Mode">
-        <i class="ph-bold ph-moon"></i>
-    </button>
-    
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-
-        <header class="text-center mb-12">
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- Sidebar -->
+        <aside class="w-72 bg-slate-900 border-r border-slate-800 flex flex-col overflow-y-auto scrollbar-hide">
             
-            <img src="profile.jpg" alt="Photo of Ali Ahmed Elgendy" class="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-white dark:border-slate-700 shadow-lg">
-
-            <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-white">Ali Ahmed Elgendy</h1>
-            
-            <div class="mt-6 flex justify-center items-center flex-wrap gap-x-5 gap-y-2 text-sm text-slate-600 dark:text-slate-400">
-                <span class="flex items-center">
-                    <i class="ph-bold ph-phone mr-1.5 text-base"></i>
-                    +20 127 439 8125
-                </span>
-                <span class="flex items-center">
-                    <i class="ph-bold ph-envelope-simple mr-1.5 text-base"></i>
-                    <a href="mailto:alielg866@gmail.com" class="hover:underline">alielg866@gmail.com</a>
-                </span>
-                <span class="flex items-center">
-                    <i class="ph-bold ph-map-pin mr-1.5 text-base"></i>
-                    Cairo, Egypt
-                </span>
-            </div>
-            <div class="mt-4 flex justify-center items-center flex-wrap gap-x-5 gap-y-2 text-sm text-slate-600 dark:text-slate-400">
-                <span class="flex items-center">
-                    <i class="ph-bold ph-github-logo mr-1.5 text-base"></i>
-                    <a href="https://github.com/elw000" target="_blank" class="font-medium text-blue-600 dark:text-sky-400 hover:underline">GitHub</a>
-                </span>
-                <span class="flex items-center">
-                    <i class="ph-bold ph-linkedin-logo mr-1.5 text-base"></i>
-                    <a href="https://www.linkedin.com/in/elw00" target="_blank" class="font-medium text-blue-600 dark:text-sky-400 hover:underline">LinkedIn</a>
-                </span>
-                <span class="flex items-center">
-                    <i class="ph-bold ph-medium-logo mr-1.5 text-base"></i>
-                    <a href="https://medium.com/@alielgendy4" target="_blank" class="font-medium text-blue-600 dark:text-sky-400 hover:underline">Medium</a>
-                </span>
-            </div>
-        </header>
-
-        <main class="space-y-10">
-
-            <section id="objective">
-                <h2 class="text-xl font-bold uppercase tracking-wider text-blue-700 dark:text-sky-400 mb-3">Objective</h2>
-                <div class="bg-white dark:bg-slate-800/50 p-6 rounded-lg shadow-sm">
-                    <p class="leading-relaxed">A passionate cybersecurity student and CTF player specializing in digital forensics. I am building upon a strong foundation in networking and Linux by actively studying DevOps, with the goal of growing into a DevSecOps role. I am eager to apply my analytical and problem-solving skills, honed through forensics CTFs, to help secure and automate the modern development lifecycle.</p>
-                </div>
-            </section>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                <section id="education">
-                    <h2 class="text-xl font-bold uppercase tracking-wider text-blue-700 dark:text-sky-400 mb-3">Education</h2>
-                    <div class="bg-white dark:bg-slate-800/50 p-6 rounded-lg shadow-sm h-full">
-                        <p class="font-bold text-slate-900 dark:text-white">Zagazig University</p>
-                        <p>Bachelor of Computer Science</p>
-                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Expected Graduation: 2027</p>
+            <!-- Profile Section -->
+            <div class="p-6 border-b border-slate-800">
+                <div class="flex items-center gap-3 mb-4">
+                    <img src="profile.jpg" alt="Ali Elgendy" class="w-12 h-12 rounded-full border-2 border-blue-500">
+                    <div>
+                        <h2 class="text-white font-bold text-lg">Ali Elgendy</h2>
+                        <p class="text-slate-400 text-xs">CTF Player</p>
                     </div>
-                </section>
+                </div>
                 
-                <section id="languages">
-                    <h2 class="text-xl font-bold uppercase tracking-wider text-blue-700 dark:text-sky-400 mb-3">Languages</h2>
-                    <div class="bg-white dark:bg-slate-800/50 p-6 rounded-lg shadow-sm h-full">
-                        <ul class="space-y-1">
-                            <li><span class="font-bold text-slate-900 dark:text-white">Arabic:</span> Native</li>
-                            <li><span class="font-bold text-slate-900 dark:text-white">English:</span> Professional Proficiency</li>
-                        </ul>
+                <!-- Stats -->
+                <div class="grid grid-cols-2 gap-2 text-center">
+                    <div class="bg-slate-800/50 rounded-lg p-3">
+                        <div class="text-3xl font-bold text-blue-400">36</div>
                     </div>
-                </section>
+                    <div class="bg-slate-800/50 rounded-lg p-3">
+                        <div class="text-3xl font-bold text-green-400">6800</div>
+                    </div>
+                </div>
             </div>
 
-            <section id="skills">
-                <h2 class="text-xl font-bold uppercase tracking-wider text-blue-700 dark:text-sky-400 mb-3">Skills</h2>
-                <div class="bg-white dark:bg-slate-800/50 p-6 rounded-lg shadow-sm">
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
-            
-                        <div>
-                            <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-2">Cybersecurity & Digital Forensics</h3>
-                            <ul class="list-disc list-inside space-y-1.5 text-slate-700 dark:text-slate-300">
-                                <li>Digital Forensics (Specializing in CTFs)</li>
-                                <li>Malware Analysis</li>
-                                <li>Penetration Testing Concepts</li>
-                                <li>Web Security (OWASP Top 10)</li>
-                                <li>Forensics Tools: <span class="font-mono text-sm bg-slate-200 dark:bg-slate-700 py-0.5 px-1 rounded">Autopsy</span>, <span class="font-mono text-sm bg-slate-200 dark:bg-slate-700 py-0.5 px-1 rounded">Volatility</span></li>
-                            </ul>
-                        </div>
-            
-                        <div>
-                            <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-2">OS & System Administration</h3>
-                            <ul class="list-disc list-inside space-y-1.5 text-slate-700 dark:text-slate-300">
-                                <li>Linux System Administration</li>
-                                <li>Linux Distributions (Red Hat, Ubuntu, Kali)</li>
-                                <li>Windows Administration</li>
-                            </ul>
-                        </div>
-            
-                        <div>
-                            <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-2">Programming & Scripting</h3>
-                            <ul class="list-disc list-inside space-y-1.5 text-slate-700 dark:text-slate-300">
-                                <li>Python</li>
-                                <li>Bash & Powershell</li>
-                            </ul>
-                        </div>
+            <!-- Navigation -->
+            <nav class="flex-1 p-4">
+                <div class="space-y-1">
+                    <a href="index.html" class="sidebar-link flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white">
+                        <i class="ph-bold ph-house text-lg"></i>
+                        <span class="font-medium">Home</span>
+                    </a>
+                    <a href="#overview" onclick="showSection('overview')" class="sidebar-link active flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white">
+                        <i class="ph-bold ph-chart-bar text-lg"></i>
+                        <span class="font-medium">Overview</span>
+                    </a>
+                </div>
 
-                        <div>
-                            <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-2">Currently Learning: DevOps & DevSecOps</h3>
-                             <ul class="list-disc list-inside space-y-1.5 text-slate-700 dark:text-slate-300">
-                                <li><span class="font-medium">CI/CD:</span> Jenkins, GitHub Actions</li>
-                                <li><span class="font-medium">Containerization:</span> Docker, Kubernetes</li>
-                                <li><span class="font-medium">IaC:</span> Terraform, Ansible</li>
-                                <li><span class="font-medium">Monitoring:</span> Prometheus, Grafana</li>
-                            </ul>
-                        </div>
-
+                <!-- CTF Events -->
+                <div class="mt-6">
+                    <h3 class="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">CTF Events</h3>
+                    <div class="space-y-1">
+                        <a href="#poctf2025" onclick="showSection('poctf2025')" class="sidebar-link flex items-center justify-between px-4 py-2.5 rounded-lg text-slate-400 hover:text-white">
+                            <div class="flex items-center gap-3">
+                                <i class="ph-bold ph-flag text-lg"></i>
+                                <span class="font-medium">PointerOverflow CTF</span>
+                            </div>
+                            <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full">36</span>
+                        </a>
+                        <a href="#cyctf2024" onclick="showSection('cyctf2024')" class="sidebar-link flex items-center justify-between px-4 py-2.5 rounded-lg text-slate-400 hover:text-white">
+                            <div class="flex items-center gap-3">
+                                <i class="ph-bold ph-flag text-lg"></i>
+                                <span class="font-medium">CyberTalents CTF</span>
+                            </div>
+                            <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded-full">0</span>
+                        </a>
                     </div>
                 </div>
-            </section>
 
-            <section id="certifications">
-                <h2 class="text-xl font-bold uppercase tracking-wider text-blue-700 dark:text-sky-400 mb-3">Licenses & Certifications</h2>
-                <div class="bg-white dark:bg-slate-800/50 p-6 rounded-lg shadow-sm">
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-            
-                        <div>
-                            <p class="font-semibold text-slate-900 dark:text-white">Security+ SY0-601</p>
-                            <p class="text-sm text-slate-600 dark:text-slate-400">from Netriders</p>
-                            <p class="text-xs font-mono text-slate-500 mt-1">Issued: Jan 2024</p>
-                        </div>
-
-                        <div>
-                            <p class="font-semibold text-slate-900 dark:text-white">Jr Penetration Tester</p>
-                            <p class="text-sm text-slate-600 dark:text-slate-400">from TryHackMe</p>
-                        </div>
-
-                        <div>
-                            <p class="font-semibold text-slate-900 dark:text-white">SOC Level 1</p>
-                            <p class="text-sm text-slate-600 dark:text-slate-400">from TryHackMe</p>
-                        </div>
-
-                        <div>
-                            <p class="font-semibold text-slate-900 dark:text-white">Pre Security</p>
-                            <p class="text-sm text-slate-600 dark:text-slate-400">from TryHackMe</p>
-                        </div>
-                        
-                        <div>
-                            <p class="font-semibold text-slate-900 dark:text-white">Web Fundamentals</p>
-                            <p class="text-sm text-slate-600 dark:text-slate-400">from TryHackMe</p>
-                        </div>
-
-                        <div>
-                            <p class="font-semibold text-slate-900 dark:text-white">Linux Server Administration</p>
-                            <p class="text-sm text-slate-600 dark:text-slate-400">from Udemy</p>
-                        </div>
-
-                        <div>
-                            <p class="font-semibold text-slate-900 dark:text-white">Linux100</p>
-                            <p class="text-sm text-slate-600 dark:text-slate-400">from TCM Security</p>
-                        </div>
-
-                        <div>
-                            <p class="font-semibold text-slate-900 dark:text-white">Red Hat System Administration</p>
-                            <p class="text-sm text-slate-600 dark:text-slate-400">from MaharaTech - ITIMooca</p>
-                        </div>
-
-                        <div>
-                            <p class="font-semibold text-slate-900 dark:text-white">Malware Analysis Fundamentals</p>
-                            <p class="text-sm text-slate-600 dark:text-slate-400">from MaharaTech - ITIMooca</p>
-                        </div>
-                        
-                        <div>
-                            <p class="font-semibold text-slate-900 dark:text-white">OWASP Top 10 (Web) 2021</p>
-                            <p class="text-sm text-slate-600 dark:text-slate-400">from MaharaTech - ITIMooca</p>
-                        </div>
-
-                        <div>
-                            <p class="font-semibold text-slate-900 dark:text-white">Introduction to Network Security</p>
-                            <p class="text-sm text-slate-600 dark:text-slate-400">from MaharaTech - ITIMooca</p>
-                        </div>
-                        
+                <!-- Categories -->
+                <div class="mt-6">
+                    <h3 class="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Categories</h3>
+                    <div class="space-y-1">
+                        <button onclick="filterCategory('crypto')" class="sidebar-link w-full flex items-center justify-between px-4 py-2 rounded-lg text-slate-400 hover:text-white">
+                            <div class="flex items-center gap-3">
+                                <i class="ph-bold ph-lock text-lg text-purple-400"></i>
+                                <span class="text-sm">Crypto</span>
+                            </div>
+                            <span class="text-xs text-slate-500">7</span>
+                        </button>
+                        <button onclick="filterCategory('reverse')" class="sidebar-link w-full flex items-center justify-between px-4 py-2 rounded-lg text-slate-400 hover:text-white">
+                            <div class="flex items-center gap-3">
+                                <i class="ph-bold ph-arrows-clockwise text-lg text-blue-400"></i>
+                                <span class="text-sm">Reverse</span>
+                            </div>
+                            <span class="text-xs text-slate-500">8</span>
+                        </button>
+                        <button onclick="filterCategory('exploit')" class="sidebar-link w-full flex items-center justify-between px-4 py-2 rounded-lg text-slate-400 hover:text-white">
+                            <div class="flex items-center gap-3">
+                                <i class="ph-bold ph-bug text-lg text-red-400"></i>
+                                <span class="text-sm">Exploit</span>
+                            </div>
+                            <span class="text-xs text-slate-500">5</span>
+                        </button>
+                        <button onclick="filterCategory('web')" class="sidebar-link w-full flex items-center justify-between px-4 py-2 rounded-lg text-slate-400 hover:text-white">
+                            <div class="flex items-center gap-3">
+                                <i class="ph-bold ph-globe text-lg text-green-400"></i>
+                                <span class="text-sm">Web</span>
+                            </div>
+                            <span class="text-xs text-slate-500">9</span>
+                        </button>
+                        <button onclick="filterCategory('forensics')" class="sidebar-link w-full flex items-center justify-between px-4 py-2 rounded-lg text-slate-400 hover:text-white">
+                            <div class="flex items-center gap-3">
+                                <i class="ph-bold ph-magnifying-glass text-lg text-indigo-400"></i>
+                                <span class="text-sm">Forensics</span>
+                            </div>
+                            <span class="text-xs text-slate-500">3</span>
+                        </button>
+                        <button onclick="filterCategory('osint')" class="sidebar-link w-full flex items-center justify-between px-4 py-2 rounded-lg text-slate-400 hover:text-white">
+                            <div class="flex items-center gap-3">
+                                <i class="ph-bold ph-binoculars text-lg text-yellow-400"></i>
+                                <span class="text-sm">OSINT</span>
+                            </div>
+                            <span class="text-xs text-slate-500">3</span>
+                        </button>
+                        <button onclick="filterCategory('stego')" class="sidebar-link w-full flex items-center justify-between px-4 py-2 rounded-lg text-slate-400 hover:text-white">
+                            <div class="flex items-center gap-3">
+                                <i class="ph-bold ph-image text-lg text-pink-400"></i>
+                                <span class="text-sm">Stego</span>
+                            </div>
+                            <span class="text-xs text-slate-500">1</span>
+                        </button>
+                        <button onclick="filterCategory('misc')" class="sidebar-link w-full flex items-center justify-between px-4 py-2 rounded-lg text-slate-400 hover:text-white">
+                            <div class="flex items-center gap-3">
+                                <i class="ph-bold ph-puzzle-piece text-lg text-orange-400"></i>
+                                <span class="text-sm">Misc</span>
+                            </div>
+                            <span class="text-xs text-slate-500">1</span>
+                        </button>
                     </div>
                 </div>
-            </section>
+            </nav>
 
+            <!-- Footer Links -->
+            <div class="p-4 border-t border-slate-800">
+                <div class="flex justify-center gap-4">
+                    <a href="https://github.com/elw000" target="_blank" class="text-slate-400 hover:text-white transition-colors">
+                        <i class="ph-bold ph-github-logo text-xl"></i>
+                    </a>
+                    <a href="https://www.linkedin.com/in/elw00" target="_blank" class="text-slate-400 hover:text-white transition-colors">
+                        <i class="ph-bold ph-linkedin-logo text-xl"></i>
+                    </a>
+                    <a href="https://medium.com/@alielgendy4" target="_blank" class="text-slate-400 hover:text-white transition-colors">
+                        <i class="ph-bold ph-medium-logo text-xl"></i>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto bg-black">
+            
+            <!-- Header -->
+            <header class="sticky top-0 z-10 bg-slate-900/95 backdrop-blur-sm border-b border-slate-800 px-8 py-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-white">CTF Writeups</h1>
+                        <p class="text-sm text-slate-400 mt-1">My journey through Capture The Flag competitions</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <input type="text" id="searchInput" placeholder="Search challenges..." class="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500" onkeyup="searchChallenges()">
+                        <button class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors">
+                            <i class="ph-bold ph-funnel text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="p-8">
+                
+                <!-- Overview Section -->
+                <div id="overview-section" class="section-content">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                        <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-6 text-white">
+                            <div class="flex items-center justify-between mb-2">
+                                <i class="ph-bold ph-trophy text-3xl opacity-80"></i>
+                                <span class="text-4xl font-bold">36</span>
+                            </div>
+                            <p class="text-sm opacity-90">Challenges Solved</p>
+                        </div>
+                        <div class="bg-gradient-to-br from-green-600 to-green-700 rounded-xl p-6 text-white">
+                            <div class="flex items-center justify-between mb-2">
+                                <i class="ph-bold ph-chart-line text-3xl opacity-80"></i>
+                                <span class="text-4xl font-bold">6800</span>
+                            </div>
+                            <p class="text-sm opacity-90">Total Points</p>
+                        </div>
+                        <div class="bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl p-6 text-white">
+                            <div class="flex items-center justify-between mb-2">
+                                <i class="ph-bold ph-folders text-3xl opacity-80"></i>
+                                <span class="text-4xl font-bold">8</span>
+                            </div>
+                            <p class="text-sm opacity-90">Categories</p>
+                        </div>
+                        <div class="bg-gradient-to-br from-orange-600 to-orange-700 rounded-xl p-6 text-white">
+                            <div class="flex items-center justify-between mb-2">
+                                <i class="ph-bold ph-flag text-3xl opacity-80"></i>
+                                <span class="text-4xl font-bold">1</span>
+                            </div>
+                            <p class="text-sm opacity-90">CTF Events</p>
+                        </div>
+                    </div>
+
+                    <h2 class="text-xl font-bold text-white mb-4">Recent Writeups</h2>
+                    <div id="challenges-container" class="space-y-3">
+                        <!-- Challenges will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- PointerOverflow CTF Section -->
+                <div id="poctf2025-section" class="section-content hidden">
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold text-white mb-2">PointerOverflow CTF 2025</h2>
+                        <p class="text-slate-400">November 5-10, 2025 • 36 Challenges Solved • 6800 Points</p>
+                    </div>
+                    
+                    <div id="poctf-challenges" class="space-y-3">
+                        <!-- PointerOverflow challenges -->
+                    </div>
+                </div>
+
+                <!-- CyberTalents CTF Section -->
+                <div id="cyctf2024-section" class="section-content hidden">
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold text-white mb-2">CyberTalents CTF 2024</h2>
+                        <p class="text-slate-400">Coming Soon • Writeups will be added here</p>
+                    </div>
+                    
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-12 text-center">
+                        <i class="ph-bold ph-file-text text-6xl text-slate-700 mb-4"></i>
+                        <h3 class="text-xl font-semibold text-white mb-2">No Writeups Yet</h3>
+                        <p class="text-slate-400">Check back soon for CyberTalents CTF writeups!</p>
+                    </div>
+                </div>
+
+            </div>
         </main>
-
-        <footer class="text-center mt-16 text-sm text-slate-500">
-            <p>&copy; 2025 Ali Ahmed Elgendy</p>
-        </footer>
-
     </div>
 
     <script>
-        const htmlElement = document.documentElement;
-        const toggleButton = document.querySelector('button[aria-label="Toggle Dark Mode"]');
-        const moonIcon = '<i class="ph-bold ph-moon"></i>';
-        const sunIcon = '<i class="ph-bold ph-sun"></i>';
+        // Challenge data
+        const challenges = [
+            // Crypto
+            { name: "This is Not the Way", category: "crypto", points: 400, date: "Nov 9, 2025", ctf: "poctf2025", desc: "Advanced cryptographic challenge involving custom encryption schemes" },
+            { name: "Mason, Adytum", category: "crypto", points: 300, date: "Nov 5, 2025", ctf: "poctf2025", desc: "Complex cryptographic puzzle" },
+            { name: "Pale Fire", category: "crypto", points: 200, date: "Nov 9, 2025", ctf: "poctf2025", desc: "Cryptanalysis challenge" },
+            { name: "A Short Walk on a Long Hill", category: "crypto", points: 200, date: "Nov 5, 2025", ctf: "poctf2025", desc: "Encryption analysis" },
+            { name: "Ashes to Ashes", category: "crypto", points: 100, date: "Nov 9, 2025", ctf: "poctf2025", desc: "Basic crypto challenge" },
+            { name: "Mason, Umbra", category: "crypto", points: 100, date: "Nov 5, 2025", ctf: "poctf2025", desc: "Crypto fundamentals" },
+            { name: "Mason, Lumen", category: "crypto", points: 100, date: "Nov 5, 2025", ctf: "poctf2025", desc: "Introduction to cryptography" },
+            
+            // Reverse
+            { name: "Through a Glass Darkly", category: "reverse", points: 300, date: "Nov 10, 2025", ctf: "poctf2025", desc: "WebAssembly reverse engineering with custom encryption", writeup: "reverse-300-1.html" },
+            { name: "Make the Pieces Sing", category: "reverse", points: 300, date: "Nov 10, 2025", ctf: "poctf2025", desc: "MIDI file analysis and reverse engineering", writeup: "reverse-300-2.html" },
+            { name: "The Glass Bead Game", category: "reverse", points: 200, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Complex binary analysis", writeup: "reverse-200-3.html" },
+            { name: "Bearing the Load", category: "reverse", points: 200, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Binary reverse engineering", writeup: "reverse-200-2.html" },
+            { name: "Gremlins in the Gears", category: "reverse", points: 100, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Basic reverse engineering", writeup: "reverse-100-4.html" },
+            { name: "A Tree of Knives", category: "reverse", points: 100, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Simple binary analysis", writeup: "reverse-100-3.html" },
+            { name: "Left at the Light", category: "reverse", points: 100, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Introduction to reversing", writeup: "reverse-100-2.html" },
+            { name: "Seven Easy Pieces", category: "reverse", points: 100, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Beginner reverse challenge", writeup: "reverse-100-1.html" },
+            
+            // Exploit
+            { name: "Choir Invisible", category: "exploit", points: 300, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Kernel-level Use-After-Free vulnerability exploitation", writeup: "exploit-300-1.html" },
+            { name: "Count the Cost", category: "exploit", points: 200, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Integer overflow exploitation", writeup: "exploit-200-2.html" },
+            { name: "Queue the Music", category: "exploit", points: 200, date: "Nov 5, 2025", ctf: "poctf2025", desc: "Buffer overflow challenge" },
+            { name: "The Floor is Lava", category: "exploit", points: 100, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Classic stack smashing", writeup: "exploit-100-4.html" },
+            { name: "Mason, Meridian", category: "exploit", points: 100, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Heartbleed-style vulnerability", writeup: "exploit-100-2.html" },
+            
+            // Web
+            { name: "Mouth of Sauron", category: "web", points: 400, date: "Nov 6, 2025", ctf: "poctf2025", desc: "Advanced web exploitation with authentication bypass" },
+            { name: "The Shape of Water", category: "web", points: 300, date: "Nov 6, 2025", ctf: "poctf2025", desc: "Complex web security challenge" },
+            { name: "Friend of a Friend", category: "web", points: 300, date: "Nov 6, 2025", ctf: "poctf2025", desc: "Social engineering web exploit" },
+            { name: "Chiaroscuro", category: "web", points: 200, date: "Nov 6, 2025", ctf: "poctf2025", desc: "Web application security" },
+            { name: "The Gift Horse", category: "web", points: 200, date: "Nov 9, 2025", ctf: "poctf2025", desc: "Web vulnerability analysis" },
+            { name: "What's Mine is Yours", category: "web", points: 200, date: "Nov 6, 2025", ctf: "poctf2025", desc: "Web exploitation" },
+            { name: "Mason, Initiate", category: "web", points: 100, date: "Nov 6, 2025", ctf: "poctf2025", desc: "Web security basics" },
+            { name: "This Must Be the Place", category: "web", points: 100, date: "Nov 9, 2025", ctf: "poctf2025", desc: "Simple web challenge" },
+            
+            // Forensics
+            { name: "The Banshees of Inisherin", category: "forensics", points: 200, date: "Nov 5, 2025", ctf: "poctf2025", desc: "Digital forensics and artifact analysis" },
+            { name: "Dust in the Attic", category: "forensics", points: 200, date: "Nov 5, 2025", ctf: "poctf2025", desc: "File system forensics" },
+            { name: "Breadcrumbs and Coffee", category: "forensics", points: 100, date: "Nov 5, 2025", ctf: "poctf2025", desc: "Basic forensics challenge" },
+            
+            // OSINT
+            { name: "Map of Uncharted Waters", category: "osint", points: 300, date: "Nov 9, 2025", ctf: "poctf2025", desc: "Open-source intelligence gathering and analysis" },
+            { name: "The Paper Trail", category: "osint", points: 200, date: "Nov 9, 2025", ctf: "poctf2025", desc: "Document investigation" },
+            { name: "Room with a View", category: "osint", points: 100, date: "Nov 9, 2025", ctf: "poctf2025", desc: "Location identification" },
+            
+            // Stego
+            { name: "The Quiet Part", category: "stego", points: 100, date: "Nov 9, 2025", ctf: "poctf2025", desc: "Steganography challenge" },
+            
+            // Misc
+            { name: "Honey, I Shrunk the Kids", category: "misc", points: 100, date: "Nov 9, 2025", ctf: "poctf2025", desc: "Miscellaneous challenge" },
+        ];
 
-        // Function to set the theme and icon
-        function applyTheme(theme) {
-            if (theme === 'dark') {
-                htmlElement.classList.add('dark');
-                toggleButton.innerHTML = sunIcon;
-            } else {
-                htmlElement.classList.remove('dark');
-                toggleButton.innerHTML = moonIcon;
-            }
+        const categoryColors = {
+            crypto: { bg: 'bg-purple-500/10', text: 'text-purple-400', border: 'border-purple-500/30', icon: 'ph-lock' },
+            reverse: { bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-blue-500/30', icon: 'ph-arrows-clockwise' },
+            exploit: { bg: 'bg-red-500/10', text: 'text-red-400', border: 'border-red-500/30', icon: 'ph-bug' },
+            web: { bg: 'bg-green-500/10', text: 'text-green-400', border: 'border-green-500/30', icon: 'ph-globe' },
+            forensics: { bg: 'bg-indigo-500/10', text: 'text-indigo-400', border: 'border-indigo-500/30', icon: 'ph-magnifying-glass' },
+            osint: { bg: 'bg-yellow-500/10', text: 'text-yellow-400', border: 'border-yellow-500/30', icon: 'ph-binoculars' },
+            stego: { bg: 'bg-pink-500/10', text: 'text-pink-400', border: 'border-pink-500/30', icon: 'ph-image' },
+            misc: { bg: 'bg-orange-500/10', text: 'text-orange-400', border: 'border-orange-500/30', icon: 'ph-puzzle-piece' }
+        };
+
+        function renderChallenges(challengeList, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = challengeList.map(challenge => {
+                const colors = categoryColors[challenge.category];
+                const writeupLink = challenge.writeup ? `writeups/${challenge.writeup}` : '#';
+                const hasWriteup = !!challenge.writeup;
+                
+                return `
+                    <a href="${writeupLink}" class="challenge-card ${challenge.category} bg-slate-900 border border-slate-800 rounded-lg p-5 hover:border-slate-700 block ${hasWriteup ? 'cursor-pointer' : 'cursor-default'}">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="${colors.bg} ${colors.text} p-2 rounded-lg">
+                                    <i class="ph-bold ${colors.icon} text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-white font-semibold text-lg">${challenge.name}</h3>
+                                    <p class="text-slate-400 text-sm mt-1">${challenge.desc}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold ${colors.text}">${challenge.points}</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between mt-4 pt-4 border-t border-slate-800">
+                            <div class="flex items-center gap-4">
+                                <span class="category-badge ${colors.bg} ${colors.text} border ${colors.border}">${challenge.category}</span>
+                                <span class="text-xs text-slate-500 flex items-center gap-1">
+                                    <i class="ph-bold ph-calendar"></i>
+                                    ${challenge.date}
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                ${hasWriteup ? '<span class="text-xs text-blue-400 flex items-center gap-1"><i class="ph-bold ph-file-text"></i>Writeup</span>' : ''}
+                                <span class="text-xs text-green-400 flex items-center gap-1">
+                                    <i class="ph-bold ph-check-circle"></i>
+                                    Solved
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                `;
+            }).join('');
         }
 
-        // Check local storage first
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            applyTheme(savedTheme);
-        } else {
-            // If no theme saved, use system preference
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            applyTheme(prefersDark ? 'dark' : 'light');
+        function showSection(sectionName) {
+            document.querySelectorAll('.section-content').forEach(section => {
+                section.classList.add('hidden');
+            });
+            document.getElementById(sectionName + '-section').classList.remove('hidden');
+            
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.closest('.sidebar-link').classList.add('active');
         }
 
-        function toggleMode() {
-            const isDark = htmlElement.classList.toggle('dark');
-            const newTheme = isDark ? 'dark' : 'light';
-            localStorage.setItem('theme', newTheme);
-            applyTheme(newTheme);
+        function filterCategory(category) {
+            const cards = document.querySelectorAll('.challenge-card');
+            cards.forEach(card => {
+                if (card.classList.contains(category)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
+
+        function searchChallenges() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.challenge-card');
+            
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(searchTerm) ? 'block' : 'none';
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderChallenges(challenges, 'challenges-container');
+            renderChallenges(challenges.filter(c => c.ctf === 'poctf2025'), 'poctf-challenges');
+        });
     </script>
+
 </body>
 </html>
