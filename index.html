@@ -87,10 +87,10 @@
                 <!-- Stats -->
                 <div class="grid grid-cols-2 gap-2 text-center">
                     <div class="bg-slate-800/50 rounded-lg p-3">
-                        <div class="text-3xl font-bold text-blue-400">36</div>
+                        <div class="text-3xl font-bold text-blue-400">12</div>
                     </div>
                     <div class="bg-slate-800/50 rounded-lg p-3">
-                        <div class="text-3xl font-bold text-green-400">6800</div>
+                        <div class="text-3xl font-bold text-green-400">1400</div>
                     </div>
                 </div>
             </div>
@@ -237,21 +237,21 @@
                         <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-6 text-white">
                             <div class="flex items-center justify-between mb-2">
                                 <i class="ph-bold ph-trophy text-3xl opacity-80"></i>
-                                <span class="text-4xl font-bold">36</span>
+                                <span class="text-4xl font-bold">12</span>
                             </div>
                             <p class="text-sm opacity-90">Challenges Solved</p>
                         </div>
                         <div class="bg-gradient-to-br from-green-600 to-green-700 rounded-xl p-6 text-white">
                             <div class="flex items-center justify-between mb-2">
                                 <i class="ph-bold ph-chart-line text-3xl opacity-80"></i>
-                                <span class="text-4xl font-bold">6800</span>
+                                <span class="text-4xl font-bold">1400</span>
                             </div>
                             <p class="text-sm opacity-90">Total Points</p>
                         </div>
                         <div class="bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl p-6 text-white">
                             <div class="flex items-center justify-between mb-2">
                                 <i class="ph-bold ph-folders text-3xl opacity-80"></i>
-                                <span class="text-4xl font-bold">8</span>
+                                <span class="text-4xl font-bold">2</span>
                             </div>
                             <p class="text-sm opacity-90">Categories</p>
                         </div>
@@ -301,59 +301,23 @@
     </div>
 
     <script>
-        // Challenge data
+        // Challenge data - Only challenges with writeups
         const challenges = [
-            // Crypto
-            { name: "This is Not the Way", category: "crypto", points: 400, date: "Nov 9, 2025", ctf: "poctf2025", desc: "Advanced cryptographic challenge involving custom encryption schemes" },
-            { name: "Mason, Adytum", category: "crypto", points: 300, date: "Nov 5, 2025", ctf: "poctf2025", desc: "Complex cryptographic puzzle" },
-            { name: "Pale Fire", category: "crypto", points: 200, date: "Nov 9, 2025", ctf: "poctf2025", desc: "Cryptanalysis challenge" },
-            { name: "A Short Walk on a Long Hill", category: "crypto", points: 200, date: "Nov 5, 2025", ctf: "poctf2025", desc: "Encryption analysis" },
-            { name: "Ashes to Ashes", category: "crypto", points: 100, date: "Nov 9, 2025", ctf: "poctf2025", desc: "Basic crypto challenge" },
-            { name: "Mason, Umbra", category: "crypto", points: 100, date: "Nov 5, 2025", ctf: "poctf2025", desc: "Crypto fundamentals" },
-            { name: "Mason, Lumen", category: "crypto", points: 100, date: "Nov 5, 2025", ctf: "poctf2025", desc: "Introduction to cryptography" },
-            
-            // Reverse
+            // Reverse Engineering (8 challenges)
             { name: "Through a Glass Darkly", category: "reverse", points: 300, date: "Nov 10, 2025", ctf: "poctf2025", desc: "WebAssembly reverse engineering with custom encryption", writeup: "reverse-300-1.html" },
             { name: "Make the Pieces Sing", category: "reverse", points: 300, date: "Nov 10, 2025", ctf: "poctf2025", desc: "MIDI file analysis and reverse engineering", writeup: "reverse-300-2.html" },
-            { name: "The Glass Bead Game", category: "reverse", points: 200, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Complex binary analysis", writeup: "reverse-200-3.html" },
-            { name: "Bearing the Load", category: "reverse", points: 200, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Binary reverse engineering", writeup: "reverse-200-2.html" },
-            { name: "Gremlins in the Gears", category: "reverse", points: 100, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Basic reverse engineering", writeup: "reverse-100-4.html" },
-            { name: "A Tree of Knives", category: "reverse", points: 100, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Simple binary analysis", writeup: "reverse-100-3.html" },
-            { name: "Left at the Light", category: "reverse", points: 100, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Introduction to reversing", writeup: "reverse-100-2.html" },
-            { name: "Seven Easy Pieces", category: "reverse", points: 100, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Beginner reverse challenge", writeup: "reverse-100-1.html" },
+            { name: "The Glass Bead Game", category: "reverse", points: 200, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Base64 and ROT13 encoding", writeup: "reverse-200-3.html" },
+            { name: "Bearing the Load", category: "reverse", points: 200, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Dynamic analysis with ltrace", writeup: "reverse-200-2.html" },
+            { name: "Gremlins in the Gears", category: "reverse", points: 100, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Character transformation challenge", writeup: "reverse-100-4.html" },
+            { name: "A Tree of Knives", category: "reverse", points: 100, date: "Nov 10, 2025", ctf: "poctf2025", desc: "XOR encoding challenge", writeup: "reverse-100-3.html" },
+            { name: "Left at the Light", category: "reverse", points: 100, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Basic string manipulation", writeup: "reverse-100-2.html" },
+            { name: "Seven Easy Pieces", category: "reverse", points: 100, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Beginner reverse challenge with strings", writeup: "reverse-100-1.html" },
             
-            // Exploit
+            // Binary Exploitation (4 challenges)
             { name: "Choir Invisible", category: "exploit", points: 300, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Kernel-level Use-After-Free vulnerability exploitation", writeup: "exploit-300-1.html" },
-            { name: "Count the Cost", category: "exploit", points: 200, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Integer overflow exploitation", writeup: "exploit-200-2.html" },
-            { name: "Queue the Music", category: "exploit", points: 200, date: "Nov 5, 2025", ctf: "poctf2025", desc: "Buffer overflow challenge" },
-            { name: "The Floor is Lava", category: "exploit", points: 100, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Classic stack smashing", writeup: "exploit-100-4.html" },
-            { name: "Mason, Meridian", category: "exploit", points: 100, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Heartbleed-style vulnerability", writeup: "exploit-100-2.html" },
-            
-            // Web
-            { name: "Mouth of Sauron", category: "web", points: 400, date: "Nov 6, 2025", ctf: "poctf2025", desc: "Advanced web exploitation with authentication bypass" },
-            { name: "The Shape of Water", category: "web", points: 300, date: "Nov 6, 2025", ctf: "poctf2025", desc: "Complex web security challenge" },
-            { name: "Friend of a Friend", category: "web", points: 300, date: "Nov 6, 2025", ctf: "poctf2025", desc: "Social engineering web exploit" },
-            { name: "Chiaroscuro", category: "web", points: 200, date: "Nov 6, 2025", ctf: "poctf2025", desc: "Web application security" },
-            { name: "The Gift Horse", category: "web", points: 200, date: "Nov 9, 2025", ctf: "poctf2025", desc: "Web vulnerability analysis" },
-            { name: "What's Mine is Yours", category: "web", points: 200, date: "Nov 6, 2025", ctf: "poctf2025", desc: "Web exploitation" },
-            { name: "Mason, Initiate", category: "web", points: 100, date: "Nov 6, 2025", ctf: "poctf2025", desc: "Web security basics" },
-            { name: "This Must Be the Place", category: "web", points: 100, date: "Nov 9, 2025", ctf: "poctf2025", desc: "Simple web challenge" },
-            
-            // Forensics
-            { name: "The Banshees of Inisherin", category: "forensics", points: 200, date: "Nov 5, 2025", ctf: "poctf2025", desc: "Digital forensics and artifact analysis" },
-            { name: "Dust in the Attic", category: "forensics", points: 200, date: "Nov 5, 2025", ctf: "poctf2025", desc: "File system forensics" },
-            { name: "Breadcrumbs and Coffee", category: "forensics", points: 100, date: "Nov 5, 2025", ctf: "poctf2025", desc: "Basic forensics challenge" },
-            
-            // OSINT
-            { name: "Map of Uncharted Waters", category: "osint", points: 300, date: "Nov 9, 2025", ctf: "poctf2025", desc: "Open-source intelligence gathering and analysis" },
-            { name: "The Paper Trail", category: "osint", points: 200, date: "Nov 9, 2025", ctf: "poctf2025", desc: "Document investigation" },
-            { name: "Room with a View", category: "osint", points: 100, date: "Nov 9, 2025", ctf: "poctf2025", desc: "Location identification" },
-            
-            // Stego
-            { name: "The Quiet Part", category: "stego", points: 100, date: "Nov 9, 2025", ctf: "poctf2025", desc: "Steganography challenge" },
-            
-            // Misc
-            { name: "Honey, I Shrunk the Kids", category: "misc", points: 100, date: "Nov 9, 2025", ctf: "poctf2025", desc: "Miscellaneous challenge" },
+            { name: "Count the Cost", category: "exploit", points: 200, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Integer overflow to buffer overflow", writeup: "exploit-200-2.html" },
+            { name: "The Floor is Lava", category: "exploit", points: 100, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Classic stack buffer overflow", writeup: "exploit-100-4.html" },
+            { name: "Mason, Meridian", category: "exploit", points: 100, date: "Nov 10, 2025", ctf: "poctf2025", desc: "Heartbleed-style information disclosure", writeup: "exploit-100-2.html" },
         ];
 
         const categoryColors = {
