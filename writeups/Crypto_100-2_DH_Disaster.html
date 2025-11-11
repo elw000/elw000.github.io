@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crypto 100-2: Diffie-Hellman Disaster</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body{font-family:'Inter',sans-serif}
+    code,pre{font-family:'JetBrains Mono',monospace}
+    .container{max-width:900px}
+    a.back{display:inline-flex;align-items:center;gap:.5rem}
+  </style>
+</head>
+<body class="bg-black text-slate-300 antialiased">
+  <header class="sticky top-0 z-10 bg-slate-900/90 backdrop-blur border-b border-slate-800">
+    <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="../index.html" class="back text-cyan-300 hover:text-cyan-200"><span>↩</span><span>Back to Home</span></a>
+      <div class="text-slate-400 text-xs">CTF Writeup</div>
+    </div>
+  </header>
+  <main class="container mx-auto px-4 py-6">
+<h1 class="text-white mt-6 mb-3 font-semibold">Crypto 100-2: Diffie-Hellman Disaster</h1>
+
+<p class="mb-3 leading-7">**Category:** Cryptography  </p>
+<p class="mb-3 leading-7">**Points:** 100  </p>
+<p class="mb-3 leading-7">**Author:** UWSP CTF Team  </p>
+<p class="mb-3 leading-7">**Solved by:** elw00</p>
+
+<p class="mb-3 leading-7">---</p>
+
+<h2 class="text-white mt-6 mb-3 font-semibold">Challenge Description</h2>
+
+<p class="mb-3 leading-7">A Diffie-Hellman key exchange implementation with a critical flaw. The server uses DH to establish a shared secret and encrypts the flag with it.</p>
+
+<p class="mb-3 leading-7">---</p>
+
+<h2 class="text-white mt-6 mb-3 font-semibold">Initial Analysis</h2>
+
+<p class="mb-3 leading-7">Diffie-Hellman key exchange works as follows:</p>
+<p class="mb-3 leading-7">1. Public parameters: prime `p` and generator `g`</p>
+<p class="mb-3 leading-7">2. Alice picks secret `a`, sends `A = g^a mod p`</p>
+<p class="mb-3 leading-7">3. Bob picks secret `b`, sends `B = g^b mod p`</p>
+<p class="mb-3 leading-7">4. Shared secret: `s = A^b = B^a = g^(ab) mod p`</p>
+
+<p class="mb-3 leading-7">Looking at the provided parameters, we notice something catastrophic:</p>
+
+<pre class="bg-slate-900 border border-slate-800 rounded p-4 overflow-x-auto"><code>p = 0xffffffffffffffffc90fdaa22168c234c4c6628b80dc1cd129024e088a67cc74020bbea63b139b22514a08798e3404ddef9519b3cd3a431b302b0a6df25f14374fe1356d6d51c245e485b576625e7ec6f44c42e9a637ed6b0bff5cb6f406b7edee386bfb5a899fa5ae9f24117c4b1fe649286651ece45b3dc2007cb8a163bf0598da48361c55d39a69163fa8fd24cf5f83655d23dca3ad961c62f356208552bb9ed529077096966d670c354e4abc9804f1746c08ca18217c32905e462e36ce3be39e772c180e86039b2783a2ec07a28fb5c55df06f4c52c9de2bcbf6955817183995497cea956ae515d2261898fa051015728e5a8aacaa68ffffffffffffffff
+g = 1  # !!!</code></pre>
+
+<p class="mb-3 leading-7">**The generator is 1!** This is a catastrophic mistake.</p>
+
+<p class="mb-3 leading-7">---</p>
+
+<h2 class="text-white mt-6 mb-3 font-semibold">Solution</h2>
+
+<h3 class="text-white mt-6 mb-3 font-semibold">The Vulnerability</h3>
+
+<p class="mb-3 leading-7">When `g = 1`:</p>
+<ul class="list-disc list-inside space-y-1">
+<li>`A = g^a mod p = 1^a mod p = 1` for any `a`</li>
+<ul class="list-disc list-inside space-y-1">
+<li>`B = g^b mod p = 1^b mod p = 1` for any `b`</li>
+<ul class="list-disc list-inside space-y-1">
+<li>**Shared secret = 1** regardless of private keys!</li>
+
+<p class="mb-3 leading-7">This completely breaks the security of Diffie-Hellman.</p>
+
+<h3 class="text-white mt-6 mb-3 font-semibold">Exploit Code</h3>
+
+<pre class="bg-slate-900 border border-slate-800 rounded p-4 overflow-x-auto"><code>#!/usr/bin/env python3
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
+import hashlib
+
+print(&quot;=&quot;*60)
+print(&quot;Diffie-Hellman Disaster - Exploit&quot;)
+print(&quot;=&quot;*60)
+
+# Read parameters from challenge
+with open(&#x27;params.txt&#x27;, &#x27;r&#x27;) as f:
+    lines = f.readlines()
+    p = int(lines[0].split(&#x27;=&#x27;)[1].strip(), 16)
+    g = int(lines[1].split(&#x27;=&#x27;)[1].strip())
+    A = int(lines[2].split(&#x27;=&#x27;)[1].strip(), 16)
+    B = int(lines[3].split(&#x27;=&#x27;)[1].strip(), 16)
+
+# Read ciphertext
+with open(&#x27;ciphertext.bin&#x27;, &#x27;rb&#x27;) as f:
+    ciphertext = f.read()
+
+print(f&quot;\n[*] Parameters:&quot;)
+print(f&quot;    p = {hex(p)[:50]}...&quot;)
+print(f&quot;    g = {g}&quot;)
+print(f&quot;    A = {hex(A)}&quot;)
+print(f&quot;    B = {hex(B)}&quot;)
+print(f&quot;\n[!] Generator g = 1 detected!&quot;)
+print(f&quot;[!] This means shared secret is always 1&quot;)
+
+# Since g=1, shared secret is always 1
+shared_secret = 1
+
+print(f&quot;\n[*] Shared secret: {shared_secret}&quot;)
+
+# Derive AES key from shared secret
+key = hashlib.sha256(str(shared_secret).encode()).digest()[:16]
+print(f&quot;[*] Derived key: {key.hex()}&quot;)
+
+# Decrypt using AES-ECB
+cipher = AES.new(key, AES.MODE_ECB)
+plaintext = unpad(cipher.decrypt(ciphertext), 16)
+
+print(f&quot;\n[+] Decrypted plaintext: {plaintext}&quot;)
+print(f&quot;\n{&#x27;=&#x27;*60}&quot;)
+print(f&quot;🚩 FLAG: {plaintext.decode()}&quot;)
+print(f&quot;{&#x27;=&#x27;*60}&quot;)</code></pre>
+
+<h3 class="text-white mt-6 mb-3 font-semibold">Execution</h3>
+
+<pre class="bg-slate-900 border border-slate-800 rounded p-4 overflow-x-auto"><code>$ python3 solve.py
+============================================================
+Diffie-Hellman Disaster - Exploit
+============================================================
+
+[*] Parameters:
+    p = 0xffffffffffffffffc90fdaa22168c234c4c6628b80dc...
+    g = 1
+    A = 0x1
+    B = 0x1
+
+[!] Generator g = 1 detected!
+[!] This means shared secret is always 1
+
+[*] Shared secret: 1
+[*] Derived key: 6b86b273ff34fce19d6b804eff5a3f57
+
+[+] Decrypted plaintext: b&#x27;poctf{uwsp_n3v3r_us3_6_3qu4ls_1}&#x27;
+
+============================================================
+🚩 FLAG: poctf{uwsp_n3v3r_us3_6_3qu4ls_1}
+============================================================</code></pre>
+
+<p class="mb-3 leading-7">---</p>
+
+<h2 class="text-white mt-6 mb-3 font-semibold">Flag</h2>
+
+<pre class="bg-slate-900 border border-slate-800 rounded p-4 overflow-x-auto"><code>poctf{uwsp_n3v3r_us3_6_3qu4ls_1}</code></pre>
+
+<p class="mb-3 leading-7">---</p>
+
+<h2 class="text-white mt-6 mb-3 font-semibold">Key Takeaways</h2>
+
+<p class="mb-3 leading-7">1. **Always Validate DH Parameters**</p>
+<pre class="bg-slate-900 border border-slate-800 rounded p-4 overflow-x-auto"><code>   def validate_dh_params(p, g):
+       # g must be &gt; 1
+       if g &lt;= 1:
+           raise ValueError(&quot;Invalid generator: g must be &gt; 1&quot;)
+       
+       # g must be &lt; p
+       if g &gt;= p:
+           raise ValueError(&quot;Invalid generator: g must be &lt; p&quot;)
+       
+       # p should be a safe prime (p = 2q + 1)
+       # g should be a generator of the multiplicative group
+       return True</code></pre>
+
+<p class="mb-3 leading-7">2. **Common DH Vulnerabilities**</p>
+<ul class="list-disc list-inside space-y-1">
+<li>`g = 1`: Shared secret always 1</li>
+<ul class="list-disc list-inside space-y-1">
+<li>`g = p - 1`: Shared secret is 1 or p-1</li>
+<ul class="list-disc list-inside space-y-1">
+<li>`g = p`: Shared secret always 0</li>
+<ul class="list-disc list-inside space-y-1">
+<li>Small subgroup attacks</li>
+<ul class="list-disc list-inside space-y-1">
+<li>Man-in-the-middle attacks</li>
+
+<p class="mb-3 leading-7">3. **Proper DH Implementation**</p>
+<ul class="list-disc list-inside space-y-1">
+<li>Use standardized groups (RFC 3526, RFC 7919)</li>
+<ul class="list-disc list-inside space-y-1">
+<li>Validate all received values</li>
+<ul class="list-disc list-inside space-y-1">
+<li>Use authenticated key exchange (e.g., ECDHE with signatures)</li>
+<ul class="list-disc list-inside space-y-1">
+<li>Consider using modern alternatives like X25519</li>
+
+<p class="mb-3 leading-7">4. **Safe Primes**</p>
+<p class="mb-3 leading-7">   A safe prime is a prime `p` where `p = 2q + 1` and `q` is also prime.</p>
+<p class="mb-3 leading-7">   This prevents small subgroup attacks.</p>
+
+<p class="mb-3 leading-7">---</p>
+
+<h2 class="text-white mt-6 mb-3 font-semibold">References</h2>
+
+<ul class="list-disc list-inside space-y-1">
+<li>[RFC 2631: Diffie-Hellman Key Agreement](https://tools.ietf.org/html/rfc2631)</li>
+<ul class="list-disc list-inside space-y-1">
+<li>[RFC 3526: More Modular Exponential (MODP) Groups](https://tools.ietf.org/html/rfc3526)</li>
+<ul class="list-disc list-inside space-y-1">
+<li>[Guide to DH Parameter Validation](https://cryptobook.nakov.com/asymmetric-key-ciphers/diffie-hellman-key-exchange)</li>
+
+<p class="mb-3 leading-7">---</p>
+
+<h2 class="text-white mt-6 mb-3 font-semibold">Tools Used</h2>
+
+<ul class="list-disc list-inside space-y-1">
+<li>Python 3</li>
+<ul class="list-disc list-inside space-y-1">
+<li>pycryptodome (AES encryption)</li>
+<ul class="list-disc list-inside space-y-1">
+<li>hashlib (key derivation)</li>
+  </main>
+</body>
+</html>
