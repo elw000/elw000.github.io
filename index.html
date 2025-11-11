@@ -240,7 +240,7 @@
                 <!-- Overview Section -->
                 <div id="overview-section" class="section-content">
                     <h2 class="text-xl font-bold text-white mb-4">Recent Writeups</h2>
-                    <div id="challenges-container" class="space-y-3">
+                    <div id="challenges-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <!-- Challenges will be loaded here -->
                     </div>
                 </div>
@@ -252,7 +252,7 @@
                         <p class="text-slate-400">November 5-10, 2025 • 36 Challenges Solved • 6800 Points</p>
                     </div>
                     
-                    <div id="poctf-challenges" class="space-y-3">
+                    <div id="poctf-challenges" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <!-- PointerOverflow challenges -->
                     </div>
                 </div>
@@ -314,36 +314,18 @@
                 const hasWriteup = !!challenge.writeup;
                 
                 return `
-                    <a href="${writeupLink}" class="challenge-card ${challenge.category} bg-slate-900 border border-slate-800 rounded-lg p-5 hover:border-slate-700 block ${hasWriteup ? 'cursor-pointer' : 'cursor-default'}">
-                        <div class="flex items-start justify-between mb-3">
-                            <div class="flex items-center gap-3">
-                                <div class="${colors.bg} ${colors.text} p-2 rounded-lg">
-                                    <i class="ph-bold ${colors.icon} text-xl"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-white font-semibold text-lg">${challenge.name}</h3>
-                                    <p class="text-slate-400 text-sm mt-1">${challenge.desc}</p>
-                                </div>
+                    <a href="${writeupLink}" class="challenge-card ${challenge.category} bg-slate-900 border border-slate-800 rounded-lg p-5 hover:border-slate-700 block ${hasWriteup ? 'cursor-pointer' : 'cursor-default'} flex flex-col h-full">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="${colors.bg} ${colors.text} p-2 rounded-lg">
+                                <i class="ph-bold ${colors.icon} text-2xl"></i>
                             </div>
-                            <div class="text-right">
-                                <div class="text-2xl font-bold ${colors.text}">${challenge.points}</div>
-                            </div>
+                            <div class="text-3xl font-bold ${colors.text}">${challenge.points}</div>
                         </div>
-                        <div class="flex items-center justify-between mt-4 pt-4 border-t border-slate-800">
-                            <div class="flex items-center gap-4">
-                                <span class="category-badge ${colors.bg} ${colors.text} border ${colors.border}">${challenge.category}</span>
-                                <span class="text-xs text-slate-500 flex items-center gap-1">
-                                    <i class="ph-bold ph-calendar"></i>
-                                    ${challenge.date}
-                                </span>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                ${hasWriteup ? '<span class="text-xs text-blue-400 flex items-center gap-1"><i class="ph-bold ph-file-text"></i>Writeup</span>' : ''}
-                                <span class="text-xs text-green-400 flex items-center gap-1">
-                                    <i class="ph-bold ph-check-circle"></i>
-                                    Solved
-                                </span>
-                            </div>
+                        <h3 class="text-white font-semibold text-lg mb-2">${challenge.name}</h3>
+                        <p class="text-slate-400 text-sm mb-4 flex-grow">${challenge.desc}</p>
+                        <div class="flex items-center justify-between pt-3 border-t border-slate-800">
+                            <span class="category-badge ${colors.bg} ${colors.text} border ${colors.border} text-xs">${challenge.category}</span>
+                            ${hasWriteup ? '<span class="text-xs text-green-400 flex items-center gap-1"><i class="ph-bold ph-check-circle"></i>Solved</span>' : ''}
                         </div>
                     </a>
                 `;
