@@ -19,10 +19,17 @@
     <meta name="twitter:image" content="https://elw00.github.io/ctf-site/og-image.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Speed up first GIF/icon fetches -->
+    <link rel="dns-prefetch" href="https://media2.giphy.com">
+    <link rel="preconnect" href="https://media2.giphy.com" crossorigin>
+    <link rel="dns-prefetch" href="https://media3.giphy.com">
+    <link rel="preconnect" href="https://media3.giphy.com" crossorigin>
+    <link rel="dns-prefetch" href="https://media4.giphy.com">
+    <link rel="preconnect" href="https://media4.giphy.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     
     <script>
@@ -58,7 +65,7 @@
             content: '';
             position: absolute;
             inset: 0;
-            background-image: url('https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExaGM3YzhydjR1bWJjdTJjMjJ2Z3g3YjQ5a3B2a3hmc3hmbTdhNzh2bCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/lp3GUtG2waC88/giphy.gif');
+            background-image: url('assets/bg.gif');
             background-position: center center;
             background-size: contain; /* show entire GIF across viewports */
             background-repeat: no-repeat;
@@ -357,9 +364,9 @@
                 <div id="overview-section" class="section-content">
                     <!-- Meme Card (re-added) -->
                     <div id="meme-card" class="mb-4 relative rounded-lg overflow-hidden border border-slate-800 bg-slate-900/60 max-w-3xl mx-auto">
-                        <a href="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExemtoanVjYmhlbnJrbmRpeWl1Z2prcW1nNzhnbGl2MjNuczJnNzJqOCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/YQitE4YNQNahy/giphy.gif" target="_blank" rel="noopener noreferrer" class="block p-2">
+                        <a href="assets/meme.gif" target="_blank" rel="noopener noreferrer" class="block p-2">
                             <img
-                                src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExemtoanVjYmhlbnJrbmRpeWl1Z2prcW1nNzhnbGl2MjNuczJnNzJqOCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/YQitE4YNQNahy/giphy.gif"
+                                src="assets/meme.gif"
                                 alt="Meme"
                                 loading="lazy"
                                 class="w-full h-40 sm:h-48 md:h-56 object-contain bg-black/40 rounded-md"
@@ -538,7 +545,7 @@
             }
         }
 
-        // Loading screen animation (robust: time-based + safety fallback)
+        // Loading screen animation (robust: time-based + safety fallback + interval backup)
         document.addEventListener('DOMContentLoaded', () => {
             const progressText = document.getElementById('progress-text');
             const loadingScreen = document.getElementById('loading-screen');
@@ -556,6 +563,8 @@
             }
 
             const start = performance.now();
+            // kickstart visible progress immediately
+            progressText.textContent = '1%';
             function tick(now) {
                 if (hidden) return;
                 const elapsed = now - start;
@@ -568,6 +577,22 @@
                 requestAnimationFrame(tick);
             }
             requestAnimationFrame(tick);
+
+            // Backup timer if rAF is throttled or tab is backgrounded
+            const interval = setInterval(() => {
+                if (hidden) {
+                    clearInterval(interval);
+                    return;
+                }
+                const now = performance.now();
+                const elapsed = now - start;
+                const pct = Math.min(100, (elapsed / TOTAL_DURATION_MS) * 100);
+                progressText.textContent = Math.floor(pct) + '%';
+                if (pct >= 100) {
+                    clearInterval(interval);
+                    setTimeout(hideLoading, 150);
+                }
+            }, 120);
 
             // Safety: ensure loader disappears even if tab throttled or something stalls
             setTimeout(hideLoading, SAFETY_TIMEOUT_MS);
