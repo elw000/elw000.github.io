@@ -384,7 +384,7 @@
             
             let progress = 0;
             const interval = setInterval(() => {
-                progress += Math.random() * 5 + 2;
+                progress += Math.random() * 10 + 5;
                 if (progress > 100) progress = 100;
                 
                 progressText.textContent = Math.floor(progress) + '%';
@@ -396,9 +396,9 @@
                         setTimeout(() => {
                             loadingScreen.style.display = 'none';
                         }, 500);
-                    }, 500);
+                    }, 200);
                 }
-            }, 150);
+            }, 80);
         });
 
         // Initialize
