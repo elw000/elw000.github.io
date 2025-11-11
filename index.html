@@ -538,31 +538,39 @@
             }
         }
 
-        // Loading screen animation (deterministic to match GIF run time)
-        window.addEventListener('load', () => {
+        // Loading screen animation (robust: time-based + safety fallback)
+        document.addEventListener('DOMContentLoaded', () => {
             const progressText = document.getElementById('progress-text');
             const loadingScreen = document.getElementById('loading-screen');
-            // Adjust this to match the GIF total time (in ms)
-            const TOTAL_DURATION_MS = 3200;
+            const TOTAL_DURATION_MS = 3200; // desired intro length
+            const SAFETY_TIMEOUT_MS = 7000; // absolute fallback to remove loader
+            let hidden = false;
+
+            function hideLoading() {
+                if (hidden) return;
+                hidden = true;
+                loadingScreen.classList.add('fade-out');
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 500);
+            }
+
             const start = performance.now();
-            
             function tick(now) {
+                if (hidden) return;
                 const elapsed = now - start;
                 const pct = Math.min(100, (elapsed / TOTAL_DURATION_MS) * 100);
                 progressText.textContent = Math.floor(pct) + '%';
-                
                 if (pct >= 100) {
-                    setTimeout(() => {
-                        loadingScreen.classList.add('fade-out');
-                        setTimeout(() => {
-                            loadingScreen.style.display = 'none';
-                        }, 500);
-                    }, 150);
+                    setTimeout(hideLoading, 150);
                     return;
                 }
                 requestAnimationFrame(tick);
             }
             requestAnimationFrame(tick);
+
+            // Safety: ensure loader disappears even if tab throttled or something stalls
+            setTimeout(hideLoading, SAFETY_TIMEOUT_MS);
         });
 
         // Initialize
