@@ -4,6 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ali Elgendy - CTF Writeups</title>
+    <meta name="description" content="CTF writeups by Ali Elgendy: reverse, pwn, web, crypto, forensics and more. Practical solutions, tips and tools from real competitions.">
+    <link rel="canonical" href="https://elw00.github.io/ctf-site/">
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Ali Elgendy - CTF Writeups">
+    <meta property="og:description" content="My journey through Capture The Flag competitions. Practical writeups across reverse, pwn, web, crypto and more.">
+    <meta property="og:image" content="https://elw00.github.io/ctf-site/og-image.png">
+    <meta property="og:url" content="https://elw00.github.io/ctf-site/">
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Ali Elgendy - CTF Writeups">
+    <meta name="twitter:description" content="Practical CTF writeups: reverse, pwn, web, crypto, forensics and more.">
+    <meta name="twitter:image" content="https://elw00.github.io/ctf-site/og-image.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -28,27 +41,107 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            position: relative;
         }
+        /* Cyber grid background */
+        .cyber-bg {
+            background:
+                radial-gradient(ellipse at top, rgba(37,99,235,0.12), transparent 60%),
+                radial-gradient(ellipse at bottom, rgba(16,185,129,0.08), transparent 60%),
+                linear-gradient(0deg, transparent 24%, rgba(100,116,139,0.06) 25%, rgba(100,116,139,0.06) 26%, transparent 27%, transparent 74%, rgba(100,116,139,0.06) 75%, rgba(100,116,139,0.06) 76%, transparent 77%),
+                linear-gradient(90deg, transparent 24%, rgba(100,116,139,0.06) 25%, rgba(100,116,139,0.06) 26%, transparent 27%, transparent 74%, rgba(100,116,139,0.06) 75%, rgba(100,116,139,0.06) 76%, transparent 77%);
+            background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px;
+            background-attachment: fixed;
+        }
+        /* Animated GIF background (subtle, behind content) */
+        .gif-bg::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url('https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExemtoanVjYmhlbnJrbmRpeWl1Z2prcW1nNzhnbGl2MjNuczJnNzJqOCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/YQitE4YNQNahy/giphy.gif');
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            opacity: 0.12;
+            filter: saturate(1.1) contrast(1.05);
+            pointer-events: none;
+            z-index: 0;
+        }
+        /* Respect reduced motion: hide animated bg */
+        @media (prefers-reduced-motion: reduce) {
+            .gif-bg::before { opacity: 0 !important; }
+        }
+        /* Manual toggle */
+        .bg-off::before { opacity: 0 !important; }
         .challenge-card {
             transition: all 0.3s ease;
             border-left: 4px solid transparent;
         }
         .challenge-card:hover {
             transform: translateX(8px);
-            border-left-color: #3b82f6;
-            background: rgba(59, 130, 246, 0.05);
+            border-left-color: #22d3ee; /* cyan-400 */
+            background: rgba(34, 211, 238, 0.07);
+            box-shadow: 0 0 0 1px rgba(34,211,238,0.18), 0 8px 24px rgba(34,211,238,0.12);
         }
         .sidebar-link {
             transition: all 0.2s ease;
         }
         .sidebar-link:hover {
-            background: rgba(59, 130, 246, 0.1);
-            border-left: 3px solid #3b82f6;
+            background: rgba(34, 211, 238, 0.1);
+            border-left: 3px solid #22d3ee; /* cyan-400 */
         }
         .sidebar-link.active {
-            background: rgba(59, 130, 246, 0.15);
-            border-left: 3px solid #3b82f6;
-            color: #60a5fa;
+            background: rgba(34, 211, 238, 0.15);
+            border-left: 3px solid #22d3ee;
+            color: #67e8f9; /* cyan-300 */
+        }
+        /* Glitch title */
+        .glitch {
+            position: relative;
+            text-shadow: 0 0 8px rgba(34,211,238,0.8);
+        }
+        .glitch::before, .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            left: 0;
+            top: 0;
+            mix-blend-mode: screen;
+            opacity: 0.6;
+            clip-path: inset(0 0 0 0);
+        }
+        .glitch::before { color: #22d3ee; transform: translate(1px, 0); }
+        .glitch::after { color: #34d399; transform: translate(-1px, 0); } /* emerald */
+        @media (prefers-reduced-motion: no-preference) {
+            @keyframes scanline {
+                0% { clip-path: inset(0 0 95% 0); }
+                50% { clip-path: inset(40% 0 40% 0); }
+                100% { clip-path: inset(95% 0 0 0); }
+            }
+            .glitch::before { animation: scanline 2.8s infinite linear alternate; }
+            .glitch::after { animation: scanline 2.8s infinite linear alternate-reverse; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .glitch::before, .glitch::after { animation: none !important; }
+        }
+        /* Terminal cursor blink */
+        .terminal-cursor {
+            display: inline-block;
+            width: 0.6ch;
+            height: 1em;
+            background: currentColor;
+            margin-left: 0.2ch;
+            vertical-align: -0.15em;
+            opacity: 0.9;
+        }
+        @media (prefers-reduced-motion: no-preference) {
+            @keyframes blink {
+                0%, 49% { opacity: 0.9; }
+                50%, 100% { opacity: 0; }
+            }
+            .terminal-cursor { animation: blink 1s steps(1, end) infinite; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .terminal-cursor { animation: none !important; opacity: 0.6; }
         }
         .category-badge {
             font-size: 0.7rem;
@@ -56,6 +149,9 @@
             border-radius: 0.375rem;
             font-weight: 600;
             text-transform: uppercase;
+        }
+        .category-badge {
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
         }
         .scrollbar-hide::-webkit-scrollbar {
             display: none;
@@ -95,7 +191,7 @@
     </style>
 </head>
 
-<body class="bg-black text-slate-300 antialiased">
+<body class="bg-black text-slate-300 antialiased cyber-bg gif-bg">
 
     <!-- Loading Screen -->
     <div id="loading-screen">
@@ -132,7 +228,7 @@
                         <i class="ph-bold ph-house text-lg"></i>
                         <span class="font-medium">Home</span>
                     </a>
-                    <a href="#overview" onclick="showSection('overview')" class="sidebar-link active flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white">
+                    <a href="#overview" onclick="showSection(event, 'overview')" class="sidebar-link active flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white">
                         <i class="ph-bold ph-chart-bar text-lg"></i>
                         <span class="font-medium">Overview</span>
                     </a>
@@ -142,11 +238,11 @@
                 <div class="mt-6">
                     <h3 class="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">CTF Events</h3>
                     <div class="space-y-1">
-                        <a href="#poctf2025" onclick="showSection('poctf2025')" class="sidebar-link flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white">
+                        <a href="#poctf2025" onclick="showSection(event, 'poctf2025')" class="sidebar-link flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white">
                             <i class="ph-bold ph-flag text-lg"></i>
                             <span class="font-medium">PointerOverflow CTF</span>
                         </a>
-                        <a href="#cyctf2024" onclick="showSection('cyctf2024')" class="sidebar-link flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white">
+                        <a href="#cyctf2024" onclick="showSection(event, 'cyctf2024')" class="sidebar-link flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white">
                             <i class="ph-bold ph-flag text-lg"></i>
                             <span class="font-medium">CyberTalents CTF</span>
                         </a>
@@ -157,6 +253,10 @@
                 <div class="mt-6">
                     <h3 class="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Categories</h3>
                     <div class="space-y-1">
+                        <button onclick="filterCategory('all')" class="sidebar-link w-full flex items-center gap-3 px-4 py-2 rounded-lg text-slate-400 hover:text-white">
+                            <i class="ph-bold ph-squares-four text-lg text-slate-400"></i>
+                            <span class="text-sm">All</span>
+                        </button>
                         <button onclick="filterCategory('crypto')" class="sidebar-link w-full flex items-center gap-3 px-4 py-2 rounded-lg text-slate-400 hover:text-white">
                             <i class="ph-bold ph-lock text-lg text-purple-400"></i>
                             <span class="text-sm">Crypto</span>
@@ -196,13 +296,13 @@
             <!-- Footer Links -->
             <div class="p-4 border-t border-slate-800">
                 <div class="flex justify-center gap-4">
-                    <a href="https://github.com/elw000" target="_blank" class="text-slate-400 hover:text-white transition-colors">
+                    <a href="https://github.com/elw000" target="_blank" class="text-slate-400 hover:text-white transition-colors" rel="noopener noreferrer">
                         <i class="ph-bold ph-github-logo text-xl"></i>
                     </a>
-                    <a href="https://www.linkedin.com/in/elw00" target="_blank" class="text-slate-400 hover:text-white transition-colors">
+                    <a href="https://www.linkedin.com/in/elw00" target="_blank" class="text-slate-400 hover:text-white transition-colors" rel="noopener noreferrer">
                         <i class="ph-bold ph-linkedin-logo text-xl"></i>
                     </a>
-                    <a href="https://medium.com/@alielgendy4" target="_blank" class="text-slate-400 hover:text-white transition-colors">
+                    <a href="https://medium.com/@alielgendy4" target="_blank" class="text-slate-400 hover:text-white transition-colors" rel="noopener noreferrer">
                         <i class="ph-bold ph-medium-logo text-xl"></i>
                     </a>
                 </div>
@@ -217,17 +317,23 @@
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <!-- Menu Button -->
-                        <button onclick="toggleSidebar()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors">
+                        <button onclick="toggleSidebar()" aria-controls="sidebar" aria-expanded="false" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors">
                             <i class="ph-bold ph-list text-xl text-white"></i>
                         </button>
                         <div>
-                            <h1 class="text-xl md:text-2xl font-bold text-white">CTF Writeups</h1>
-                            <p class="text-xs md:text-sm text-slate-400 mt-1 hidden sm:block">My journey through Capture The Flag competitions</p>
+                            <h1 class="text-xl md:text-2xl font-bold text-white glitch" data-text="CTF Writeups">CTF Writeups<span class="terminal-cursor"></span></h1>
+                            <div class="mt-1 hidden sm:flex items-center gap-2">
+                                <span class="text-xs md:text-sm text-slate-400">My journey through Capture The Flag competitions</span>
+                                <span class="text-[10px] uppercase tracking-wider text-emerald-300 bg-emerald-500/10 border border-emerald-400/30 rounded px-2 py-0.5 font-mono">Cyber Security</span>
+                            </div>
                         </div>
                     </div>
                     <div class="flex items-center gap-2 md:gap-3">
+                        <button id="bgToggleBtn" class="hidden sm:inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs border border-slate-700" onclick="toggleBackground()">
+                            <i class="ph-bold ph-image"></i><span>Background</span>
+                        </button>
                         <input type="text" id="searchInput" placeholder="Search..." class="hidden sm:block bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500" onkeyup="searchChallenges()">
-                        <button class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors sm:hidden">
+                        <button class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors sm:hidden" onclick="openMobileSearch()">
                             <i class="ph-bold ph-magnifying-glass text-lg"></i>
                         </button>
                     </div>
@@ -315,11 +421,10 @@
                 
                 return `
                     <a href="${writeupLink}" class="challenge-card ${challenge.category} bg-slate-900 border border-slate-800 rounded-lg p-5 hover:border-slate-700 block ${hasWriteup ? 'cursor-pointer' : 'cursor-default'} flex flex-col h-full">
-                        <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center mb-3">
                             <div class="${colors.bg} ${colors.text} p-2 rounded-lg">
                                 <i class="ph-bold ${colors.icon} text-2xl"></i>
                             </div>
-                            <div class="text-3xl font-bold ${colors.text}">${challenge.points}</div>
                         </div>
                         <h3 class="text-white font-semibold text-lg mb-2">${challenge.name}</h3>
                         <p class="text-slate-400 text-sm mb-4 flex-grow">${challenge.desc}</p>
@@ -332,7 +437,10 @@
             }).join('');
         }
 
-        function showSection(sectionName) {
+        // Track active category for combined filtering
+        let activeCategory = null;
+
+        function showSection(evt, sectionName) {
             document.querySelectorAll('.section-content').forEach(section => {
                 section.classList.add('hidden');
             });
@@ -340,29 +448,56 @@
             
             document.querySelectorAll('.sidebar-link').forEach(link => {
                 link.classList.remove('active');
+                link.removeAttribute('aria-current');
             });
-            event.target.closest('.sidebar-link').classList.add('active');
+            if (evt && evt.target) {
+                const el = evt.target.closest('.sidebar-link');
+                el.classList.add('active');
+                el.setAttribute('aria-current', 'page');
+            } else {
+                const link = document.querySelector(`.sidebar-link[href="#${sectionName}"]`);
+                if (link) {
+                    link.classList.add('active');
+                    link.setAttribute('aria-current', 'page');
+                }
+            }
+            if (location.hash !== `#${sectionName}`) {
+                history.replaceState(null, '', `#${sectionName}`);
+            }
         }
 
-        function filterCategory(category) {
+        function applyCombinedFilters() {
+            const searchTerm = (document.getElementById('searchInput').value || '').toLowerCase();
             const cards = document.querySelectorAll('.challenge-card');
             cards.forEach(card => {
-                if (card.classList.contains(category)) {
-                    card.style.display = 'block';
+                const matchesCategory = !activeCategory || card.classList.contains(activeCategory);
+                const text = card.textContent.toLowerCase();
+                const matchesSearch = !searchTerm || text.includes(searchTerm);
+                if (matchesCategory && matchesSearch) {
+                    card.classList.remove('hidden');
                 } else {
-                    card.style.display = 'none';
+                    card.classList.add('hidden');
                 }
             });
         }
 
+        function filterCategory(category) {
+            activeCategory = category === 'all' ? null : category;
+            applyCombinedFilters();
+        }
+
         function searchChallenges() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const cards = document.querySelectorAll('.challenge-card');
-            
-            cards.forEach(card => {
-                const text = card.textContent.toLowerCase();
-                card.style.display = text.includes(searchTerm) ? 'block' : 'none';
-            });
+            applyCombinedFilters();
+        }
+
+        function openMobileSearch() {
+            const term = prompt('Search writeups...');
+            if (term !== null) {
+                const input = document.getElementById('searchInput');
+                input.value = term;
+                showSection(null, 'overview');
+                searchChallenges();
+            }
         }
 
         function toggleSidebar() {
@@ -372,40 +507,66 @@
             
             if (sidebar.classList.contains('open')) {
                 overlay.classList.remove('hidden');
+                // update aria
+                const btn = document.querySelector('[aria-controls="sidebar"]');
+                if (btn) btn.setAttribute('aria-expanded', 'true');
             } else {
                 overlay.classList.add('hidden');
+                const btn = document.querySelector('[aria-controls="sidebar"]');
+                if (btn) btn.setAttribute('aria-expanded', 'false');
             }
         }
 
-        // Loading screen animation
+        // Loading screen animation (deterministic to match GIF run time)
         window.addEventListener('load', () => {
             const progressText = document.getElementById('progress-text');
             const loadingScreen = document.getElementById('loading-screen');
+            // Adjust this to match the GIF total time (in ms)
+            const TOTAL_DURATION_MS = 3200;
+            const start = performance.now();
             
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += Math.random() * 10 + 5;
-                if (progress > 100) progress = 100;
+            function tick(now) {
+                const elapsed = now - start;
+                const pct = Math.min(100, (elapsed / TOTAL_DURATION_MS) * 100);
+                progressText.textContent = Math.floor(pct) + '%';
                 
-                progressText.textContent = Math.floor(progress) + '%';
-                
-                if (progress >= 100) {
-                    clearInterval(interval);
+                if (pct >= 100) {
                     setTimeout(() => {
                         loadingScreen.classList.add('fade-out');
                         setTimeout(() => {
                             loadingScreen.style.display = 'none';
                         }, 500);
-                    }, 200);
+                    }, 150);
+                    return;
                 }
-            }, 80);
+                requestAnimationFrame(tick);
+            }
+            requestAnimationFrame(tick);
         });
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             renderChallenges(challenges, 'challenges-container');
             renderChallenges(challenges.filter(c => c.ctf === 'poctf2025'), 'poctf-challenges');
+            const initialHash = (location.hash || '#overview').replace('#', '');
+            showSection(null, initialHash);
+            applyCombinedFilters();
+            // ESC closes sidebar
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    const sidebar = document.getElementById('sidebar');
+                    if (sidebar && sidebar.classList.contains('open')) {
+                        toggleSidebar();
+                    }
+                }
+            });
         });
+
+        // Toggle animated background visibility
+        function toggleBackground() {
+            const body = document.body;
+            body.classList.toggle('bg-off');
+        }
     </script>
 
 </body>
